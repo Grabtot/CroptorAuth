@@ -1,23 +1,26 @@
 ﻿using System.ComponentModel.DataAnnotations;
 
-namespace CroptorAuth.Pages.Account.Register
+namespace CroptorAuth.Pages.Register
 {
-    public class InputModel
+    public partial class RegisterModel
     {
-        [Required]
-        public string Username { get; set; }
+        public class InputModel
+        {
+            [Required]
+            [EmailAddress]
+            [Display(Name = "Email")]
+            public string Email { get; set; }
 
-        [Required, EmailAddress]
-        public string Email { get; set; }
+            [Required]
+            [StringLength(100, ErrorMessage = "The {0} must be at least {2} and at max {1} characters long.", MinimumLength = 6)]
+            [DataType(DataType.Password)]
+            [Display(Name = "Password")]
+            public string Password { get; set; }
 
-        [Required]
-        public string Password { get; set; }
-
-        [Required, Compare(nameof(Password))]
-        public string ConfirmPassword { get; set; }
-
-        public string ReturnUrl { get; set; }
-
-        public string Button { get; set; }
+            [DataType(DataType.Password)]
+            [Display(Name = "Confirm password")]
+            [Compare("Password", ErrorMessage = "The password and confirmation password do not match.")]
+            public string ConfirmPassword { get; set; }
+        }
     }
 }

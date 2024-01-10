@@ -19,7 +19,9 @@ namespace CroptorAuth
             builder.Services.AddDbContext<ApplicationDbContext>(options =>
                 options.UseNpgsql(connectionString));
 
-            builder.Services.AddIdentity<ApplicationUser, IdentityRole<Guid>>()
+            builder.Services.AddIdentity<ApplicationUser, IdentityRole<Guid>>(options =>
+            {
+            })
                 .AddEntityFrameworkStores<ApplicationDbContext>()
                 .AddDefaultTokenProviders();
 
@@ -60,6 +62,8 @@ namespace CroptorAuth
             //    options.ClientId = "";
             //    options.ClientSecret = "";
             //});
+
+            //  builder.Services.AddScoped<IEmailSender<ApplicationUser>, HostingerEmailSender>();
 
             return builder.Build();
         }

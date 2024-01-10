@@ -23,3 +23,5 @@ namespace CroptorAuth.Services
         }
     }
 }
+
+namespace CroptorAuth.Pages { }
