@@ -2,7 +2,7 @@ using Duende.IdentityServer.Services;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 
-namespace CroptorAuth.Pages.Account.Logout
+namespace CroptorAuth.Pages.Logout
 {
     [SecurityHeaders]
     [AllowAnonymous]
@@ -20,7 +20,7 @@ namespace CroptorAuth.Pages.Account.Logout
         public async Task OnGet(string logoutId)
         {
             // get context information (client name, post logout redirect URI and iframe for federated signout)
-            var logout = await _interactionService.GetLogoutContextAsync(logoutId);
+            Duende.IdentityServer.Models.LogoutRequest logout = await _interactionService.GetLogoutContextAsync(logoutId);
 
             View = new LoggedOutViewModel
             {

@@ -1,4 +1,4 @@
-namespace CroptorAuth.Pages.Account.Logout
+namespace CroptorAuth.Pages.Logout
 {
     public class LogoutOptions
     {

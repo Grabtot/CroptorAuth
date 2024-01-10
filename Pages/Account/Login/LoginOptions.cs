@@ -1,4 +1,4 @@
-namespace CroptorAuth.Pages.Account.Login
+namespace CroptorAuth.Pages.Login
 {
     public class LoginOptions
     {

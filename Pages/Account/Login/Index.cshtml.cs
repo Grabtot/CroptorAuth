@@ -9,7 +9,7 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 
-namespace CroptorAuth.Pages.Account.Login
+namespace CroptorAuth.Pages.Login
 {
     [SecurityHeaders]
     [AllowAnonymous]

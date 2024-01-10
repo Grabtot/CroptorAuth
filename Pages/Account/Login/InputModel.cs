@@ -4,7 +4,7 @@
 
 using System.ComponentModel.DataAnnotations;
 
-namespace CroptorAuth.Pages.Account.Login
+namespace CroptorAuth.Pages.Login
 {
     public class InputModel
     {

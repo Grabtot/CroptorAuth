@@ -9,7 +9,7 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 
-namespace CroptorAuth.Pages.Account.Logout
+namespace CroptorAuth.Pages.Logout
 {
     [SecurityHeaders]
     [AllowAnonymous]
@@ -42,7 +42,7 @@ namespace CroptorAuth.Pages.Account.Logout
             }
             else
             {
-                var context = await _interaction.GetLogoutContextAsync(LogoutId);
+                Duende.IdentityServer.Models.LogoutRequest context = await _interaction.GetLogoutContextAsync(LogoutId);
                 if (context?.ShowSignoutPrompt == false)
                 {
                     // it's safe to automatically sign-out
@@ -76,7 +76,7 @@ namespace CroptorAuth.Pages.Account.Logout
                 await _events.RaiseAsync(new UserLogoutSuccessEvent(User.GetSubjectId(), User.GetDisplayName()));
 
                 // see if we need to trigger federated logout
-                var idp = User.FindFirst(JwtClaimTypes.IdentityProvider)?.Value;
+                string idp = User.FindFirst(JwtClaimTypes.IdentityProvider)?.Value;
 
                 // if it's a local login we can ignore this workflow
                 if (idp != null && idp != Duende.IdentityServer.IdentityServerConstants.LocalIdentityProvider)
