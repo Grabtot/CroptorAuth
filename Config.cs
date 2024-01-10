@@ -9,6 +9,7 @@ namespace CroptorAuth
             {
                 new IdentityResources.OpenId(),
                 new IdentityResources.Profile(),
+                new IdentityResource("plan", ["plan"])
             };
 
         public static IEnumerable<ApiResource> ApiResources =>
@@ -44,7 +45,7 @@ namespace CroptorAuth
                     PostLogoutRedirectUris = { "http://localhost:3000/signout-callback-oidc" },
 
                     AllowOfflineAccess = true,
-                    AllowedScopes = { "openid", "profile", "croptor.read", "croptor.write" },
+                    AllowedScopes = { "openid", "profile", "croptor.read", "croptor.write","plan" },
 
                 }
             };

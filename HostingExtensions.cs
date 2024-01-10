@@ -1,5 +1,6 @@
 using CroptorAuth.Data;
 using CroptorAuth.Models;
+using CroptorAuth.Services;
 using Duende.IdentityServer;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
@@ -37,7 +38,8 @@ namespace CroptorAuth
                 .AddInMemoryApiScopes(Config.ApiScopes)
                 .AddInMemoryApiResources(Config.ApiResources)
                 .AddInMemoryClients(Config.Clients)
-                .AddAspNetIdentity<ApplicationUser>();
+                .AddAspNetIdentity<ApplicationUser>()
+                .AddProfileService<CroptorProfileService>();
 
             builder.Services.AddAuthentication()
                 .AddGoogle(options =>
