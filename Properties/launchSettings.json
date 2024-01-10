@@ -1,0 +1,21 @@
+{
+  "profiles": {
+    "SelfHost": {
+      "commandName": "Project",
+      "commandLineArgs": "\r\n",
+      "launchBrowser": true,
+      "environmentVariables": {
+        "ASPNETCORE_ENVIRONMENT": "Development"
+      },
+      "applicationUrl": "https://localhost:7443"
+    },
+    "Seed": {
+      "commandName": "Project",
+      "commandLineArgs": "/seed",
+      "environmentVariables": {
+        "ASPNETCORE_ENVIRONMENT": "Development"
+      },
+      "applicationUrl": "https://localhost:7443"
+    }
+  }
+}
