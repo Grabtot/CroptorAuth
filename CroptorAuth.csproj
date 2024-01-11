@@ -3,6 +3,7 @@
 	<PropertyGroup>
 		<TargetFramework>net8.0</TargetFramework>
 		<ImplicitUsings>enable</ImplicitUsings>
+		<UserSecretsId>0669ba7e-7b11-4309-9e62-3ca3e79544e1</UserSecretsId>
 	</PropertyGroup>
 
 	<ItemGroup>

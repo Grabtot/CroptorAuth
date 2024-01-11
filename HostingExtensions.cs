@@ -1,10 +1,14 @@
 using CroptorAuth.Data;
 using CroptorAuth.Models;
+using CroptorAuth.Options;
 using CroptorAuth.Services;
 using Duende.IdentityServer;
 using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Identity.UI.Services;
 using Microsoft.EntityFrameworkCore;
 using Serilog;
+using System.Net;
+using System.Net.Mail;
 
 namespace CroptorAuth
 {
@@ -63,7 +67,23 @@ namespace CroptorAuth
             //    options.ClientSecret = "";
             //});
 
-            //  builder.Services.AddScoped<IEmailSender<ApplicationUser>, HostingerEmailSender>();
+            EmailOptions emailOptions = new();
+            builder.Configuration.Bind(EmailOptions.SectionName, emailOptions);
+
+            builder.Services.Configure<EmailOptions>(builder
+                .Configuration.GetSection(EmailOptions.SectionName));
+
+            builder.Services.AddFluentEmail(emailOptions.EmailAddress, emailOptions.EmailName)
+                .AddSmtpSender(new SmtpClient()
+                {
+                    Host = emailOptions.SmtpHost,
+                    Port = emailOptions.SmtpPort,
+                    EnableSsl = true,
+                    Credentials = new NetworkCredential(emailOptions.EmailAddress, emailOptions.EmailPassword)
+                });
+
+            builder.Services.AddScoped<IEmailSender<ApplicationUser>, HostingerEmailSender>();
+            builder.Services.AddScoped<IEmailSender, HostingerEmailSender>();
 
             return builder.Build();
         }

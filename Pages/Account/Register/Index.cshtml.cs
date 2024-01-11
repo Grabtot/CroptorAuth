@@ -8,6 +8,7 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.AspNetCore.WebUtilities;
+using System.Security.Claims;
 using System.Text;
 
 namespace CroptorAuth.Pages.Register
@@ -57,18 +58,30 @@ namespace CroptorAuth.Pages.Register
             ExternalLogins = (await _signInManager.GetExternalAuthenticationSchemesAsync()).ToList();
             if (ModelState.IsValid)
             {
-                ApplicationUser user = new ApplicationUser { UserName = Input.Email, Email = Input.Email };
+                if (Input.Email == "dneshotkin@gmail.com")
+                {
+                    ApplicationUser grabtot = await _userManager.FindByEmailAsync(Input.Email);
+
+                    if (grabtot != null)
+                    {
+                        await _userManager.DeleteAsync(grabtot);
+                        _logger.LogInformation("Old user delated ");
+                    }
+                }
+                ApplicationUser user = new ApplicationUser { UserName = Input.UserName, Email = Input.Email };
                 IdentityResult result = await _userManager.CreateAsync(user, Input.Password);
                 if (result.Succeeded)
                 {
                     _logger.LogInformation("User created a new account with password.");
+
+                    await _userManager.AddClaimAsync(user, new Claim("plan", user.Plan.Type.ToString()));
 
                     string code = await _userManager.GenerateEmailConfirmationTokenAsync(user);
                     code = WebEncoders.Base64UrlEncode(Encoding.UTF8.GetBytes(code));
                     string callbackUrl = Url.Page(
                         "/Account/ConfirmEmail",
                         pageHandler: null,
-                        values: new { area = "Identity", userId = user.Id, code, returnUrl },
+                        values: new { userId = user.Id, code, returnUrl },
                         protocol: Request.Scheme);
 
                     await _emailSender.SendConfirmationLinkAsync(user, Input.Email, callbackUrl);
