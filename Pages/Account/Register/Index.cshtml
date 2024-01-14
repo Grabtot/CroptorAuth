@@ -57,16 +57,28 @@
                 }
                 else
                 {
-                    <form id="external-account" asp-page="./ExternalLogin" asp-route-returnUrl="@Model.ReturnUrl" method="post" class="form-horizontal">
-                        <div>
-                            <p>
-                                @foreach (var provider in Model.ExternalLogins!)
-                                {
-                                    <button type="submit" class="btn btn-primary" name="provider" value="@provider.Name" title="Log in using your @provider.DisplayName account">@provider.DisplayName</button>
-                                }
-                            </p>
+                    <div class="col-sm-6">
+                        <div class="card">
+                            <div class="card-header">
+                                <h2>External Account</h2>
+                            </div>
+                            <div class="card-body">
+                                <ul class="list-inline">
+                                    @foreach (var provider in Model.ExternalLogins)
+                                    {
+                                        <li class="list-inline-item">
+                                            <a class="btn btn-secondary"
+                                               asp-page="/ExternalLogin/Challenge"
+                                               asp-route-scheme="@provider.Name"
+                                               asp-route-returnUrl="@Model.ReturnUrl">
+                                                @provider.DisplayName
+                                            </a>
+                                        </li>
+                                    }
+                                </ul>
+                            </div>
                         </div>
-                    </form>
+                    </div>
                 }
             }
         </section>

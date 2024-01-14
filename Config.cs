@@ -12,17 +12,6 @@ namespace CroptorAuth
                 new IdentityResource("plan", ["plan"])
             };
 
-        public static IEnumerable<ApiResource> ApiResources =>
-           [
-               new ApiResource("croptor")
-               {
-                   Scopes = ["weatherapi.read", "weatherapi.write"],
-                   ApiSecrets = [new Secret("ScopeSecret2".Sha256())],
-
-                   UserClaims = ["plan"]
-               }
-           ];
-
         public static IEnumerable<ApiScope> ApiScopes =>
             new ApiScope[]
             {
@@ -44,7 +33,9 @@ namespace CroptorAuth
                     FrontChannelLogoutUri = "http://localhost:3000/signout-oidc",
                     PostLogoutRedirectUris = { "http://localhost:3000/signout-callback-oidc" },
 
+                    AllowedCorsOrigins = { "http://localhost:3000" },
                     AllowOfflineAccess = true,
+
                     AllowedScopes = { "openid", "profile", "croptor.read", "croptor.write","plan" },
 
                 }

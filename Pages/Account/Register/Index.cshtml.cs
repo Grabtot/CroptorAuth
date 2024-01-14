@@ -106,7 +106,7 @@ namespace CroptorAuth.Pages.Register
                         }
                         else if (string.IsNullOrEmpty(returnUrl))
                         {
-                            return Redirect("~/");
+                            return Redirect("http://loclhost:3000");
                         }
                         else
                         {
