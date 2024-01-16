@@ -15,8 +15,10 @@ namespace CroptorAuth
         public static IEnumerable<ApiScope> ApiScopes =>
             new ApiScope[]
             {
-                new ApiScope("croptor.read"),
-                new ApiScope("croptor.write"),
+                new ApiScope("croptor")
+                {
+                    UserClaims = ["plan"]
+                },
             };
 
         public static IEnumerable<Client> Clients =>
@@ -24,7 +26,7 @@ namespace CroptorAuth
             {
                 new Client
                 {
-                    ClientId = "interactive",
+                    ClientId = "web",
                     ClientSecrets = { new Secret("49C1A7E1-0C79-4A89-A3D6-A37998FB86B0".Sha256()) },
 
                     AllowedGrantTypes = GrantTypes.Code,
@@ -36,7 +38,7 @@ namespace CroptorAuth
                     AllowedCorsOrigins = { "http://localhost:3000" },
                     AllowOfflineAccess = true,
 
-                    AllowedScopes = { "openid", "profile", "croptor.read", "croptor.write","plan" },
+                    AllowedScopes = { "openid", "profile", "croptor" },
 
                 }
             };

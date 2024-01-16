@@ -4,10 +4,11 @@
     {
         public const string SectionName = "EmailOptions";
 
-        public string EmailAddress { get; private set; }
-        public string EmailName { get; private set; }
-        public string EmailPassword { get; private set; }
-        public string SmtpHost { get; private set; }
-        public int SmtpPort { get; private set; }
+        public string EmailAddress { get; set; }
+        public string EmailName { get; set; }
+        public string EmailPassword { get; set; }
+        public string SmtpHost { get; set; }
+        public int SmtpPort { get; set; }
+        public bool EnableSsl { get; set; }
     }
 }

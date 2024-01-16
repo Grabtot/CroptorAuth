@@ -1,5 +1,6 @@
 using CroptorAuth.Data;
 using CroptorAuth.Models;
+using CroptorAuth.Options;
 using CroptorAuth.Services;
 using Duende.IdentityServer;
 using Microsoft.AspNetCore.Identity;
@@ -35,9 +36,6 @@ namespace CroptorAuth
                     options.Events.RaiseInformationEvents = true;
                     options.Events.RaiseFailureEvents = true;
                     options.Events.RaiseSuccessEvents = true;
-
-                    // see https://docs.duendesoftware.com/identityserver/v6/fundamentals/resources/
-                    options.EmitStaticAudienceClaim = true;
                 })
                 .AddInMemoryIdentityResources(Config.IdentityResources)
                 .AddInMemoryApiScopes(Config.ApiScopes)
@@ -50,9 +48,6 @@ namespace CroptorAuth
                 {
                     options.SignInScheme = IdentityServerConstants.ExternalCookieAuthenticationScheme;
 
-                    // register your IdentityServer with Google at https://console.developers.google.com
-                    // enable the Google+ API
-                    // set the redirect URI to https://localhost:5001/signin-google
                     options.ClientId = builder.Configuration["Authentication:Google:ClientId"];
                     options.ClientSecret = builder.Configuration["Authentication:Google:ClientSecret"];
                 });
@@ -65,15 +60,18 @@ namespace CroptorAuth
             //    options.ClientSecret = "";
             //});
 
+            EmailOptions emailOptions = new();//builder.Configuration.GetSection(EmailOptions.SectionName)
+            builder.Configuration.Bind(EmailOptions.SectionName, emailOptions);
 
+            builder.Services.AddSingleton(Microsoft.Extensions.Options.Options.Create(emailOptions));
 
-            builder.Services.AddFluentEmail("noreply@croptor.com", "Croptor")
+            builder.Services.AddFluentEmail(emailOptions.EmailAddress, emailOptions.EmailName)
                 .AddSmtpSender(new SmtpClient()
                 {
-                    Host = "smtp.hostinger.com",
-                    Port = 587,
-                    EnableSsl = true,
-                    Credentials = new NetworkCredential("noreply@croptor.com", "CroptorNoreply87!")
+                    Host = emailOptions.SmtpHost,
+                    Port = emailOptions.SmtpPort,
+                    EnableSsl = emailOptions.EnableSsl,
+                    Credentials = new NetworkCredential(emailOptions.EmailAddress, emailOptions.EmailPassword)
                 });
 
             builder.Services.AddScoped<IEmailSender<ApplicationUser>, HostingerEmailSender>();
