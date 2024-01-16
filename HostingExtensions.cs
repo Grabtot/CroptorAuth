@@ -21,10 +21,16 @@ namespace CroptorAuth
             string connectionString = builder.Configuration.GetConnectionString("DefaultConnection");
 
             builder.Services.AddDbContext<ApplicationDbContext>(options =>
-                options.UseNpgsql(connectionString));
+            {
+                options.UseNpgsql(connectionString, options =>
+                    options.EnableRetryOnFailure());
+            });
 
             builder.Services.AddIdentity<ApplicationUser, IdentityRole<Guid>>(options =>
             {
+                options.User.RequireUniqueEmail = true;
+
+                options.User.AllowedUserNameCharacters = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789-._@+ àáâã´äåºæçè³¿éêëìíîïğñòóôõö÷øùüşÿÀÁÂÃ¥ÄÅªÆÇÈ²¯ÉÊËÌÍÎÏĞÑÒÓÔÕÖ×ØÙÜŞß ";
             })
                 .AddEntityFrameworkStores<ApplicationDbContext>()
                 .AddDefaultTokenProviders();
@@ -37,11 +43,11 @@ namespace CroptorAuth
                     options.Events.RaiseFailureEvents = true;
                     options.Events.RaiseSuccessEvents = true;
                 })
+                // .AddProfileService<CroptorProfileService>()
                 .AddInMemoryIdentityResources(Config.IdentityResources)
                 .AddInMemoryApiScopes(Config.ApiScopes)
                 .AddInMemoryClients(Config.Clients)
-                .AddAspNetIdentity<ApplicationUser>()
-                .AddProfileService<CroptorProfileService>();
+                .AddAspNetIdentity<ApplicationUser>();
 
             builder.Services.AddAuthentication()
                 .AddGoogle(options =>
