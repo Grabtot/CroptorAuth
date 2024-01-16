@@ -50,15 +50,14 @@ namespace CroptorAuth
 
                     options.ClientId = builder.Configuration["Authentication:Google:ClientId"];
                     options.ClientSecret = builder.Configuration["Authentication:Google:ClientSecret"];
-                });
-            //.AddFacebook(options =>
-            //{
-            //    options.SignInScheme = IdentityServerConstants.ExternalCookieAuthenticationScheme;
+                })
+                .AddFacebook(options =>
+                {
+                    options.SignInScheme = IdentityServerConstants.ExternalCookieAuthenticationScheme;
 
-            //    options.AppId = "";
-            //    options.ClientId = "";
-            //    options.ClientSecret = "";
-            //});
+                    options.AppId = builder.Configuration["Authentication:Facebook:AppId"];
+                    options.AppSecret = builder.Configuration["Authentication:Facebook:AppSecret"];
+                });
 
             EmailOptions emailOptions = new();//builder.Configuration.GetSection(EmailOptions.SectionName)
             builder.Configuration.Bind(EmailOptions.SectionName, emailOptions);

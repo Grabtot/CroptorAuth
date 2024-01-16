@@ -44,7 +44,6 @@ namespace CroptorAuth.Pages.ExternalLogin
             {
                 throw new Exception("External authentication error");
             }
-
             ClaimsPrincipal externalUser = result.Principal;
 
             if (_logger.IsEnabled(LogLevel.Debug))
@@ -134,6 +133,8 @@ namespace CroptorAuth.Pages.ExternalLogin
             if (name != null)
             {
                 filtered.Add(new Claim(JwtClaimTypes.Name, name));
+
+                user.UserName = name;
             }
             else
             {
@@ -143,15 +144,20 @@ namespace CroptorAuth.Pages.ExternalLogin
                            claims.FirstOrDefault(x => x.Type == ClaimTypes.Surname)?.Value;
                 if (first != null && last != null)
                 {
-                    filtered.Add(new Claim(JwtClaimTypes.Name, first + " " + last));
+                    string fullName = first + " " + last;
+
+                    filtered.Add(new Claim(JwtClaimTypes.Name, fullName));
+                    user.UserName = fullName;
                 }
                 else if (first != null)
                 {
                     filtered.Add(new Claim(JwtClaimTypes.Name, first));
+                    user.UserName = first;
                 }
                 else if (last != null)
                 {
                     filtered.Add(new Claim(JwtClaimTypes.Name, last));
+                    user.UserName = last;
                 }
             }
 
