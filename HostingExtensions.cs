@@ -79,8 +79,8 @@ namespace CroptorAuth
                     Credentials = new NetworkCredential(emailOptions.EmailAddress, emailOptions.EmailPassword)
                 });
 
-            builder.Services.AddScoped<IEmailSender<ApplicationUser>, HostingerEmailSender>();
-            builder.Services.AddScoped<IEmailSender, HostingerEmailSender>();
+            builder.Services.AddScoped<IEmailSender<ApplicationUser>, CroptorEmailSender>();
+            builder.Services.AddScoped<IEmailSender, CroptorEmailSender>();
 
             return builder.Build();
         }

@@ -1,6 +1,5 @@
 using Duende.IdentityServer.Services;
 using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 
 namespace CroptorAuth.Pages.Logout
@@ -18,12 +17,12 @@ namespace CroptorAuth.Pages.Logout
             _interactionService = interactionService;
         }
 
-        public async Task<IActionResult> OnGet(string logoutId)
+        public async Task OnGet(string logoutId)
         {
             // get context information (client name, post logout redirect URI and iframe for federated signout)
             Duende.IdentityServer.Models.LogoutRequest logout = await _interactionService.GetLogoutContextAsync(logoutId);
 
-            return Redirect(logout.PostLogoutRedirectUri ?? "http://localhost:3000");
+            //  return Redirect(logout.PostLogoutRedirectUri ?? "http://localhost:3000");
 
             View = new LoggedOutViewModel
             {
