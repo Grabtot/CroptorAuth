@@ -30,7 +30,7 @@ namespace CroptorAuth
             {
                 options.User.RequireUniqueEmail = true;
 
-                options.User.AllowedUserNameCharacters = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789-._@+ àáâã´äåºæçè³¿éêëìíîïğñòóôõö÷øùüşÿÀÁÂÃ¥ÄÅªÆÇÈ²¯ÉÊËÌÍÎÏĞÑÒÓÔÕÖ×ØÙÜŞß ";
+                options.User.AllowedUserNameCharacters = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789-._@+ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½è³¿ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ã¥ï¿½Åªï¿½ï¿½È²ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ";
             })
                 .AddEntityFrameworkStores<ApplicationDbContext>()
                 .AddDefaultTokenProviders();
@@ -81,6 +81,7 @@ namespace CroptorAuth
 
             builder.Services.AddScoped<IEmailSender<ApplicationUser>, HostingerEmailSender>();
             builder.Services.AddScoped<IEmailSender, HostingerEmailSender>();
+            builder.Services.AddScoped<WayForPayService>();
 
             return builder.Build();
         }
