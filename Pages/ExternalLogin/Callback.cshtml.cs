@@ -44,7 +44,7 @@ namespace CroptorAuth.Pages.ExternalLogin
             {
                 throw new Exception("External authentication error");
             }
-            ClaimsPrincipal externalUser = result.Principal;
+            ClaimsPrincipal? externalUser = result.Principal!;
 
             if (_logger.IsEnabled(LogLevel.Debug))
             {
@@ -60,17 +60,26 @@ namespace CroptorAuth.Pages.ExternalLogin
                               externalUser.FindFirst(ClaimTypes.NameIdentifier) ??
                               throw new Exception("Unknown userid");
 
-            string provider = result.Properties.Items["scheme"];
+            string provider = result.Properties!.Items["scheme"]!;
             string providerUserId = userIdClaim.Value;
 
             // find external user
-            ApplicationUser user = await _userManager.FindByLoginAsync(provider, providerUserId);
+            ApplicationUser? user = await _userManager.FindByLoginAsync(provider, providerUserId);
             if (user == null)
             {
-                // this might be where you might initiate a custom workflow for user registration
-                // in this sample we don't show how that would be done, as our sample implementation
-                // simply auto-provisions new external user
-                user = await AutoProvisionUserAsync(provider, providerUserId, externalUser.Claims);
+                Claim email = externalUser.FindFirst(JwtClaimTypes.Email) ??
+                    externalUser.FindFirst(ClaimTypes.Email)
+                    ?? throw new Exception("Unknown email");
+
+                user = await _userManager.FindByEmailAsync(email.Value);
+                if (user != null)
+                {
+                    await _userManager.AddLoginAsync(user, new UserLoginInfo(provider, providerUserId, provider));
+                }
+                else
+                {
+                    user = await AutoProvisionUserAsync(provider, providerUserId, externalUser.Claims);
+                }
             }
 
             // this allows us to collect any additional claims or properties

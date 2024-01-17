@@ -78,9 +78,9 @@ namespace CroptorAuth
                     EnableSsl = emailOptions.EnableSsl,
                     Credentials = new NetworkCredential(emailOptions.EmailAddress, emailOptions.EmailPassword)
                 });
-
-            builder.Services.AddScoped<IEmailSender<ApplicationUser>, HostingerEmailSender>();
-            builder.Services.AddScoped<IEmailSender, HostingerEmailSender>();
+            
+            builder.Services.AddScoped<IEmailSender<ApplicationUser>, CroptorEmailSender>();
+            builder.Services.AddScoped<IEmailSender, CroptorEmailSender>();
             builder.Services.AddScoped<WayForPayService>();
 
             return builder.Build();

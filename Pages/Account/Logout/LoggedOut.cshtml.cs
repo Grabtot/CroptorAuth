@@ -22,6 +22,7 @@ namespace CroptorAuth.Pages.Logout
             // get context information (client name, post logout redirect URI and iframe for federated signout)
             Duende.IdentityServer.Models.LogoutRequest logout = await _interactionService.GetLogoutContextAsync(logoutId);
 
+            //  return Redirect(logout.PostLogoutRedirectUri ?? "http://localhost:3000");
 
             View = new LoggedOutViewModel
             {

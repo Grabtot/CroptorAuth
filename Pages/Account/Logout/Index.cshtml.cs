@@ -33,7 +33,7 @@ namespace CroptorAuth.Pages.Logout
         {
             LogoutId = logoutId;
 
-            var showLogoutPrompt = LogoutOptions.ShowLogoutPrompt;
+            bool showLogoutPrompt = LogoutOptions.ShowLogoutPrompt;
 
             if (User?.Identity.IsAuthenticated != true)
             {
@@ -87,6 +87,7 @@ namespace CroptorAuth.Pages.Logout
                         // build a return URL so the upstream provider will redirect back
                         // to us after the user has logged out. this allows us to then
                         // complete our single sign-out processing.
+
                         string url = Url.Page("/Account/Logout/Loggedout", new { logoutId = LogoutId });
 
                         // this triggers a redirect to the external provider for sign-out

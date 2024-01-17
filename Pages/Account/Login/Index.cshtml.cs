@@ -90,11 +90,20 @@ namespace CroptorAuth.Pages.Login
 
             if (ModelState.IsValid)
             {
-                Microsoft.AspNetCore.Identity.SignInResult result = await _signInManager.PasswordSignInAsync(Input.Username, Input.Password, Input.RememberLogin, lockoutOnFailure: true);
-                if (result.Succeeded)
+                ApplicationUser? user = await _userManager.FindByEmailAsync(Input.Email);
+
+                bool succeeded = user is not null;
+                if (user is not null)
                 {
-                    ApplicationUser user = await _userManager.FindByNameAsync(Input.Username);
-                    await _events.RaiseAsync(new UserLoginSuccessEvent(user.UserName, user.Id.ToString(), user.UserName, clientId: context?.Client.ClientId));
+                    Microsoft.AspNetCore.Identity.SignInResult result = await _signInManager
+                        .PasswordSignInAsync(user, Input.Password, Input.RememberLogin, lockoutOnFailure: true);
+
+                    succeeded = result.Succeeded;
+                }
+
+                if (succeeded)
+                {
+                    await _events.RaiseAsync(new UserLoginSuccessEvent(user!.UserName, user.Id.ToString(), user.UserName, clientId: context?.Client.ClientId));
 
                     if (context != null)
                     {
@@ -125,7 +134,7 @@ namespace CroptorAuth.Pages.Login
                     }
                 }
 
-                await _events.RaiseAsync(new UserLoginFailureEvent(Input.Username, "invalid credentials", clientId: context?.Client.ClientId));
+                await _events.RaiseAsync(new UserLoginFailureEvent(Input.Email, "invalid credentials", clientId: context?.Client.ClientId));
                 ModelState.AddModelError(string.Empty, LoginOptions.InvalidCredentialsErrorMessage);
             }
 
@@ -152,7 +161,7 @@ namespace CroptorAuth.Pages.Login
                     EnableLocalLogin = local,
                 };
 
-                Input.Username = context?.LoginHint;
+                Input.Email = context?.LoginHint ?? string.Empty;
 
                 if (!local)
                 {
