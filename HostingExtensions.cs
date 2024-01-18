@@ -1,3 +1,4 @@
+using Croptor.Infrastructure.Persistence.Repositories;
 using CroptorAuth.Data;
 using CroptorAuth.Models;
 using CroptorAuth.Options;
@@ -9,7 +10,6 @@ using Microsoft.EntityFrameworkCore;
 using Serilog;
 using System.Net;
 using System.Net.Mail;
-using Croptor.Infrastructure.Persistence.Repositories;
 
 namespace CroptorAuth
 {
@@ -19,7 +19,8 @@ namespace CroptorAuth
         {
             builder.Services.AddRazorPages();
 
-            string connectionString = builder.Configuration.GetConnectionString("DefaultConnection");
+            string connectionString = builder.Configuration.GetConnectionString("Postgres")
+                ?? throw new Exception("Postgres connection string doesnt provided");
 
             builder.Services.AddDbContext<ApplicationDbContext>(options =>
             {
@@ -31,7 +32,7 @@ namespace CroptorAuth
             {
                 options.User.RequireUniqueEmail = true;
 
-                options.User.AllowedUserNameCharacters = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789-._@+ ��������賿�����������������������å�Ū��Ȳ��������������������� ";
+                options.User.AllowedUserNameCharacters = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789-._@+ абвгґдеєжзиіїйклмнопрстуфхцчшщьюяАБВГҐДЕЄЖЗИІЇЙКЛМНОПРСТУФХЦЧШЩЬЮЯ";
             })
                 .AddEntityFrameworkStores<ApplicationDbContext>()
                 .AddDefaultTokenProviders();
@@ -57,14 +58,15 @@ namespace CroptorAuth
 
                     options.ClientId = builder.Configuration["Authentication:Google:ClientId"];
                     options.ClientSecret = builder.Configuration["Authentication:Google:ClientSecret"];
-                })
-                .AddFacebook(options =>
-                {
-                    options.SignInScheme = IdentityServerConstants.ExternalCookieAuthenticationScheme;
-
-                    options.AppId = builder.Configuration["Authentication:Facebook:AppId"];
-                    options.AppSecret = builder.Configuration["Authentication:Facebook:AppSecret"];
                 });
+            //.AddFacebook(options =>
+            //{
+            //    options.SignInScheme = IdentityServerConstants.ExternalCookieAuthenticationScheme;
+
+            //    options.AppId = builder.Configuration["Authentication:Facebook:AppId"];
+            //    options.AppSecret = builder.Configuration["Authentication:Facebook:AppSecret"];
+
+            //});
 
             EmailOptions emailOptions = new();//builder.Configuration.GetSection(EmailOptions.SectionName)
             builder.Configuration.Bind(EmailOptions.SectionName, emailOptions);
@@ -79,7 +81,7 @@ namespace CroptorAuth
                     EnableSsl = emailOptions.EnableSsl,
                     Credentials = new NetworkCredential(emailOptions.EmailAddress, emailOptions.EmailPassword)
                 });
-            
+
             builder.Services.AddScoped<IEmailSender<ApplicationUser>, CroptorEmailSender>();
             builder.Services.AddScoped<IEmailSender, CroptorEmailSender>();
             builder.Services.AddScoped<UserProvider>();
