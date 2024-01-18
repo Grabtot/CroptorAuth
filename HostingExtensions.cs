@@ -1,3 +1,4 @@
+using Croptor.Infrastructure.Persistence.Repositories;
 using CroptorAuth.Data;
 using CroptorAuth.Models;
 using CroptorAuth.Options;
@@ -9,7 +10,6 @@ using Microsoft.EntityFrameworkCore;
 using Serilog;
 using System.Net;
 using System.Net.Mail;
-using Croptor.Infrastructure.Persistence.Repositories;
 
 namespace CroptorAuth
 {
@@ -19,7 +19,8 @@ namespace CroptorAuth
         {
             builder.Services.AddRazorPages();
 
-            string connectionString = builder.Configuration.GetConnectionString("DefaultConnection");
+            string connectionString = builder.Configuration.GetConnectionString("Postgres")
+                ?? throw new Exception("Postgres connection string doesnt provided");
 
             builder.Services.AddDbContext<ApplicationDbContext>(options =>
             {
@@ -80,7 +81,7 @@ namespace CroptorAuth
                     EnableSsl = emailOptions.EnableSsl,
                     Credentials = new NetworkCredential(emailOptions.EmailAddress, emailOptions.EmailPassword)
                 });
-            
+
             builder.Services.AddScoped<IEmailSender<ApplicationUser>, CroptorEmailSender>();
             builder.Services.AddScoped<IEmailSender, CroptorEmailSender>();
             builder.Services.AddScoped<UserProvider>();
