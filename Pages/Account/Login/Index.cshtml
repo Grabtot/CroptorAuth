@@ -4,70 +4,47 @@
 <div class="login-page">
 
     <partial name="_ValidationSummary"/>
-    @if (Model.View.EnableLocalLogin)
-    {
-        <div class="sign-card">
-            <div class="card-header">
-                <h2>Local Account</h2>
-            </div>
-
-            <div class="card-body">
-                <form asp-page="/Account/Login/Index">
-                    <input type="hidden" asp-for="Input.ReturnUrl"/>
-
-                    <div class="form-group">
-                        <label asp-for="Input.Email">email</label>
-                        <input class="form-control" placeholder="email@example.com" asp-for="Input.Email" autofocus>
-                    </div>
-                    <div class="form-group">
-                        <label asp-for="Input.Password">password</label>
-                        <input type="password" class="form-control" placeholder="type your password" asp-for="Input.Password" autocomplete="off">
-                        <a href="~/Account/ForgotPassword">Forgot password?</a>
-                    </div>
-
-                    <button class="sign-in-button" name="Input.Button" value="login">Log in</button>
-                </form>
-            </div>
-            <ul class="external">
-                @foreach (var provider in Model.View.VisibleExternalProviders)
-                {
-                    <a asp-page="/ExternalLogin/Challenge"
-                       asp-route-scheme="@provider.AuthenticationScheme"
-                       asp-route-returnUrl="@Model.Input.ReturnUrl">
-                        @if (provider.DisplayName == "Google")
-                        {
-                            <img src="~/images/login with google.svg" alt="Log in with Google"/>
-                        }
-                        @if (provider.DisplayName == "Facebook")
-                        {
-                            <img src="~/images/login with facebook.svg" alt="Log in with Facebook"/>
-                        }
-                    </a>
-                }
-            </ul>
+    <div class="sign-card">
+        <div class="header">
+            <div class="active">Log in</div>
+            <a href="~/Account/Register?ReturnUrl=@Model.Input.ReturnUrl">
+                <div>Sign Up</div>
+            </a>
         </div>
-        @* <p>Dont have an account? <a href="~/Account/Register">Register</a></p> *@
-    }
 
-    @* @if (Model.View.VisibleExternalProviders.Any()) *@
-    @* { *@
-    @*     <div class="col-sm-6"> *@
-    @*         <div class="card"> *@
-    @*             <div class="card-header"> *@
-    @*                 <h2>External Account</h2> *@
-    @*             </div> *@
-    @*             <div class="card-body"> *@
-    @* *@
-    @*             </div> *@
-    @*         </div> *@
-    @*     </div> *@
-    @* } *@
+        <div class="card-body">
+            <form asp-page="/Account/Login/Index">
+                <input type="hidden" asp-for="Input.ReturnUrl"/>
 
-    @if (!Model.View.EnableLocalLogin && !Model.View.VisibleExternalProviders.Any())
-    {
-        <div class="alert alert-warning">
-            <strong>Invalid login request</strong>
-            There are no login schemes configured for this request.
+                <div class="form-group">
+                    <label asp-for="Input.Email">email</label>
+                    <input class="form-control" placeholder="email@example.com" asp-for="Input.Email" autofocus>
+                </div>
+                <div class="form-group">
+                    <label asp-for="Input.Password">password</label>
+                    <input type="password" class="form-control" placeholder="type your password" asp-for="Input.Password" autocomplete="off">
+                    <a href="~/Account/ForgotPassword">Forgot password?</a>
+                </div>
+
+                <button class="sign-in-button" name="Input.Button" value="login">Log in</button>
+            </form>
         </div>
-    }
+        <ul class="external">
+            @foreach (var provider in Model.View.VisibleExternalProviders)
+            {
+                <a asp-page="/ExternalLogin/Challenge"
+                   asp-route-scheme="@provider.AuthenticationScheme"
+                   asp-route-returnUrl="@Model.Input.ReturnUrl">
+                    @if (provider.DisplayName == "Google")
+                    {
+                        <img src="~/images/login with google.svg" alt="Log in with Google"/>
+                    }
+                    @if (provider.DisplayName == "Facebook")
+                    {
+                        <img src="~/images/login with facebook.svg" alt="Log in with Facebook"/>
+                    }
+                </a>
+            }
+        </ul>
+    </div>
 </div>
