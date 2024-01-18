@@ -8,7 +8,7 @@
     <partial name="_ValidationSummary"/>
     <div class="sign-card">
         <div class="header">
-            <a href="~/Account/Login?ReturnUrl=@Model.ReturnUrl">
+            <a href="~/wwwroot-auth/Account/Login?ReturnUrl=@Model.ReturnUrl">
                 <div> Log in</div>
             </a>
             <div class="active">Sign Up</div>
@@ -49,11 +49,11 @@
                    asp-route-returnUrl="@Model.ReturnUrl">
                     @if (provider.DisplayName == "Google")
                     {
-                        <img src="~/images/sign up with google.svg" alt="Log in with Google"/>
+                        <img src="~/wwwroot-auth/images/sign up with google.svg" alt="Log in with Google" />
                     }
                     @if (provider.DisplayName == "Facebook")
                     {
-                        <img src="~/images/sign up with facebook.svg" alt="Log in with Facebook"/>
+                        <img src="~/wwwroot-auth/wwwroot-auth/images/sign up with facebook.svg" alt="Log in with Facebook" />
                     }
                 </a>
             }

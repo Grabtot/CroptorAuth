@@ -31,10 +31,10 @@ namespace CroptorAuth
 
                     AllowedGrantTypes = GrantTypes.Code,
 
-                    RedirectUris = [ "http://localhost:3000/signin-oidc", "https://cropto.com/signin-oidc" ],
+                    RedirectUris = [ "http://localhost:3000/signin-oidc", "https://croptor.com/signin-oidc" ],
                     FrontChannelLogoutUri = "http://localhost:3000/signout-oidc",
                     PostLogoutRedirectUris = { "http://localhost:3000/signout-callback-oidc",
-                        "https://cropto.com//signout-callback-oidc" },
+                        "https://croptor.com//signout-callback-oidc" },
 
                     AllowedCorsOrigins = { "http://localhost:3000" ,"https://croptor.com"},
                     AllowOfflineAccess = true,
