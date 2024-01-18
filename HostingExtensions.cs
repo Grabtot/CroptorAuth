@@ -9,6 +9,7 @@ using Microsoft.EntityFrameworkCore;
 using Serilog;
 using System.Net;
 using System.Net.Mail;
+using Croptor.Infrastructure.Persistence.Repositories;
 
 namespace CroptorAuth
 {
@@ -30,7 +31,7 @@ namespace CroptorAuth
             {
                 options.User.RequireUniqueEmail = true;
 
-                options.User.AllowedUserNameCharacters = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789-._@+ àáâã´äåºæçè³¿éêëìíîïðñòóôõö÷øùüþÿÀÁÂÃ¥ÄÅªÆÇÈ²¯ÉÊËÌÍÎÏÐÑÒÓÔÕÖ×ØÙÜÞß ";
+                options.User.AllowedUserNameCharacters = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789-._@+ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½è³¿ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ã¥ï¿½Åªï¿½ï¿½È²ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ";
             })
                 .AddEntityFrameworkStores<ApplicationDbContext>()
                 .AddDefaultTokenProviders();
@@ -79,9 +80,13 @@ namespace CroptorAuth
                     EnableSsl = emailOptions.EnableSsl,
                     Credentials = new NetworkCredential(emailOptions.EmailAddress, emailOptions.EmailPassword)
                 });
-
+            
             builder.Services.AddScoped<IEmailSender<ApplicationUser>, CroptorEmailSender>();
             builder.Services.AddScoped<IEmailSender, CroptorEmailSender>();
+            builder.Services.AddScoped<UserProvider>();
+            builder.Services.AddScoped<UserRepository>();
+            builder.Services.AddScoped<OrderRepository>();
+            builder.Services.AddScoped<WayForPayService>();
 
             return builder.Build();
         }
