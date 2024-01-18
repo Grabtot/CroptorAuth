@@ -111,11 +111,12 @@
     display: flex;
     justify-content: center;
     align-items: center;
-    color: #b3c0cd;
     font-size: 1.6rem;
     user-select: none;
     cursor: pointer;
     text-decoration: none;
+    background: #00dede;
+    color: white;
 }
 .sign-card .header > *:first-child {
     border-top-left-radius: .5rem;
@@ -125,6 +126,6 @@
 }
 .sign-card .header > *.active {
     flex: 1;
-    background: #00dede;
-    color: white;
+    color: #b3c0cd;
+    background: white;
 }
