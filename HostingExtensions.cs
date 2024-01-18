@@ -9,6 +9,7 @@ using Microsoft.EntityFrameworkCore;
 using Serilog;
 using System.Net;
 using System.Net.Mail;
+using Croptor.Infrastructure.Persistence.Repositories;
 
 namespace CroptorAuth
 {
@@ -81,6 +82,9 @@ namespace CroptorAuth
             
             builder.Services.AddScoped<IEmailSender<ApplicationUser>, CroptorEmailSender>();
             builder.Services.AddScoped<IEmailSender, CroptorEmailSender>();
+            builder.Services.AddScoped<UserProvider>();
+            builder.Services.AddScoped<UserRepository>();
+            builder.Services.AddScoped<OrderRepository>();
             builder.Services.AddScoped<WayForPayService>();
 
             return builder.Build();

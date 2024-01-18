@@ -1,39 +1,89 @@
 ﻿.welcome-page .logo {
-  width: 64px;
+    width: 64px;
 }
 
 .icon-banner {
-  width: 32px;
+    width: 32px;
 }
 
 .body-container {
-  margin-top: 60px;
-  padding-bottom: 40px;
+    margin-top: 60px;
+    padding-bottom: 40px;
 }
 
 .welcome-page li {
-  list-style: none;
-  padding: 4px;
+    list-style: none;
+    padding: 4px;
 }
 
 .logged-out-page iframe {
-  display: none;
-  width: 0;
-  height: 0;
+    display: none;
+    width: 0;
+    height: 0;
 }
 
 .grants-page .card {
-  margin-top: 20px;
-  border-bottom: 1px solid lightgray;
+    margin-top: 20px;
+    border-bottom: 1px solid lightgray;
 }
 .grants-page .card .card-title {
-  font-size: 120%;
-  font-weight: bold;
+    font-size: 120%;
+    font-weight: bold;
 }
 .grants-page .card .card-title img {
-  width: 100px;
-  height: 100px;
+    width: 100px;
+    height: 100px;
 }
 .grants-page .card label {
-  font-weight: bold;
+    font-weight: bold;
+}
+* {
+    font-family: "Mona-Sans", sans-serif;
+    font-size: .9rem;
+    letter-spacing: .05rem;
+}
+.login-page {
+    height: 70vh;
+    display: flex;
+    justify-content: center;
+    align-items: center; 
+    flex-direction: column;
+}
+.sign-in-button {
+    border: none;
+    width: calc(100% - 4rem);
+    height: 2.5rem;
+    border-radius: 1.4rem;
+    outline: none;
+    background: #00dede;
+    color: white;
+    font-size: 1.5rem;
+    margin: 0 2rem;
+}
+.sign-in-button:hover {
+    background: #00afaf;
+}
+.sign-in-button:active {
+    border: none;
+    outline: none;
+}
+.external {
+    padding: 0 1rem;
+    display: flex;
+    width: 100%;
+}
+.external a {
+    flex: 1;
+}
+.external a img {
+    width: 100%;
+}
+.sign-card {
+    width: 25rem;
+    box-shadow: .11rem .11rem .2rem rgba(75, 69, 91, .27);
+    border-radius: .5rem;
+}
+.form-field {
+    display: flex;
+    flex-direction: column;
 }
