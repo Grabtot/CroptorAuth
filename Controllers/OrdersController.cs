@@ -29,7 +29,7 @@ public class OrdersController(WayForPayService service, IConfiguration configura
     }
 
     [HttpPost("callback")]
-    public async Task<ActionResult<WayForPayCallbackResponse>> Callback(WayForPayCallback callback)
+    public async Task<ActionResult<WayForPayCallbackResponse>> Callback([FromForm] WayForPayCallback callback)
     {
         if (callback.TransactionStatus == "Approved")
         {
