@@ -8,19 +8,22 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using System.ComponentModel.DataAnnotations;
 
-namespace CroptorAuth.Pages.Account
+namespace CroptorAuth.Pages.Account.Manage
 {
-    public class SetPasswordModel : PageModel
+    public class ChangePasswordModel : PageModel
     {
         private readonly UserManager<ApplicationUser> _userManager;
         private readonly SignInManager<ApplicationUser> _signInManager;
+        private readonly ILogger<ChangePasswordModel> _logger;
 
-        public SetPasswordModel(
+        public ChangePasswordModel(
             UserManager<ApplicationUser> userManager,
-            SignInManager<ApplicationUser> signInManager)
+            SignInManager<ApplicationUser> signInManager,
+            ILogger<ChangePasswordModel> logger)
         {
             _userManager = userManager;
             _signInManager = signInManager;
+            _logger = logger;
         }
 
         /// <summary>
@@ -43,6 +46,15 @@ namespace CroptorAuth.Pages.Account
         /// </summary>
         public class InputModel
         {
+            /// <summary>
+            ///     This API supports the ASP.NET Core Identity default UI infrastructure and is not intended to be used
+            ///     directly from your code. This API may change or be removed in future releases.
+            /// </summary>
+            [Required]
+            [DataType(DataType.Password)]
+            [Display(Name = "Current password")]
+            public string OldPassword { get; set; }
+
             /// <summary>
             ///     This API supports the ASP.NET Core Identity default UI infrastructure and is not intended to be used
             ///     directly from your code. This API may change or be removed in future releases.
@@ -72,10 +84,9 @@ namespace CroptorAuth.Pages.Account
             }
 
             bool hasPassword = await _userManager.HasPasswordAsync(user);
-
-            if (hasPassword)
+            if (!hasPassword)
             {
-                return RedirectToPage("./Manage/ChangePassword");
+                return RedirectToPage("./SetPassword");
             }
 
             return Page();
@@ -94,10 +105,10 @@ namespace CroptorAuth.Pages.Account
                 return NotFound($"Unable to load user with ID '{_userManager.GetUserId(User)}'.");
             }
 
-            IdentityResult addPasswordResult = await _userManager.AddPasswordAsync(user, Input.NewPassword);
-            if (!addPasswordResult.Succeeded)
+            IdentityResult changePasswordResult = await _userManager.ChangePasswordAsync(user, Input.OldPassword, Input.NewPassword);
+            if (!changePasswordResult.Succeeded)
             {
-                foreach (IdentityError error in addPasswordResult.Errors)
+                foreach (IdentityError error in changePasswordResult.Errors)
                 {
                     ModelState.AddModelError(string.Empty, error.Description);
                 }
@@ -105,7 +116,8 @@ namespace CroptorAuth.Pages.Account
             }
 
             await _signInManager.RefreshSignInAsync(user);
-            StatusMessage = "Your password has been set.";
+            _logger.LogInformation("User changed their password successfully.");
+            StatusMessage = "Your password has been changed.";
 
             return RedirectToPage();
         }

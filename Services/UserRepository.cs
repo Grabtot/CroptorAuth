@@ -13,5 +13,6 @@ namespace Croptor.Infrastructure.Persistence.Repositories
             return await _dbSet.FindAsync([userId], cancellationToken)
                    ?? throw new InvalidOperationException($"Could not find User {userId}");
         }
+
     }
 }

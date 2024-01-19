@@ -8,19 +8,22 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using System.ComponentModel.DataAnnotations;
 
-namespace CroptorAuth.Pages.Account
+namespace CroptorAuth.Pages.Account.Manage
 {
-    public class SetPasswordModel : PageModel
+    public class DeletePersonalDataModel : PageModel
     {
         private readonly UserManager<ApplicationUser> _userManager;
         private readonly SignInManager<ApplicationUser> _signInManager;
+        private readonly ILogger<DeletePersonalDataModel> _logger;
 
-        public SetPasswordModel(
+        public DeletePersonalDataModel(
             UserManager<ApplicationUser> userManager,
-            SignInManager<ApplicationUser> signInManager)
+            SignInManager<ApplicationUser> signInManager,
+            ILogger<DeletePersonalDataModel> logger)
         {
             _userManager = userManager;
             _signInManager = signInManager;
+            _logger = logger;
         }
 
         /// <summary>
@@ -34,13 +37,6 @@ namespace CroptorAuth.Pages.Account
         ///     This API supports the ASP.NET Core Identity default UI infrastructure and is not intended to be used
         ///     directly from your code. This API may change or be removed in future releases.
         /// </summary>
-        [TempData]
-        public string StatusMessage { get; set; }
-
-        /// <summary>
-        ///     This API supports the ASP.NET Core Identity default UI infrastructure and is not intended to be used
-        ///     directly from your code. This API may change or be removed in future releases.
-        /// </summary>
         public class InputModel
         {
             /// <summary>
@@ -48,22 +44,17 @@ namespace CroptorAuth.Pages.Account
             ///     directly from your code. This API may change or be removed in future releases.
             /// </summary>
             [Required]
-            [StringLength(100, ErrorMessage = "The {0} must be at least {2} and at max {1} characters long.", MinimumLength = 6)]
             [DataType(DataType.Password)]
-            [Display(Name = "New password")]
-            public string NewPassword { get; set; }
-
-            /// <summary>
-            ///     This API supports the ASP.NET Core Identity default UI infrastructure and is not intended to be used
-            ///     directly from your code. This API may change or be removed in future releases.
-            /// </summary>
-            [DataType(DataType.Password)]
-            [Display(Name = "Confirm new password")]
-            [Compare("NewPassword", ErrorMessage = "The new password and confirmation password do not match.")]
-            public string ConfirmPassword { get; set; }
+            public string Password { get; set; }
         }
 
-        public async Task<IActionResult> OnGetAsync()
+        /// <summary>
+        ///     This API supports the ASP.NET Core Identity default UI infrastructure and is not intended to be used
+        ///     directly from your code. This API may change or be removed in future releases.
+        /// </summary>
+        public bool RequirePassword { get; set; }
+
+        public async Task<IActionResult> OnGet()
         {
             ApplicationUser user = await _userManager.GetUserAsync(User);
             if (user == null)
@@ -71,43 +62,40 @@ namespace CroptorAuth.Pages.Account
                 return NotFound($"Unable to load user with ID '{_userManager.GetUserId(User)}'.");
             }
 
-            bool hasPassword = await _userManager.HasPasswordAsync(user);
-
-            if (hasPassword)
-            {
-                return RedirectToPage("./Manage/ChangePassword");
-            }
-
+            RequirePassword = await _userManager.HasPasswordAsync(user);
             return Page();
         }
 
         public async Task<IActionResult> OnPostAsync()
         {
-            if (!ModelState.IsValid)
-            {
-                return Page();
-            }
-
             ApplicationUser user = await _userManager.GetUserAsync(User);
             if (user == null)
             {
                 return NotFound($"Unable to load user with ID '{_userManager.GetUserId(User)}'.");
             }
 
-            IdentityResult addPasswordResult = await _userManager.AddPasswordAsync(user, Input.NewPassword);
-            if (!addPasswordResult.Succeeded)
+            RequirePassword = await _userManager.HasPasswordAsync(user);
+            if (RequirePassword)
             {
-                foreach (IdentityError error in addPasswordResult.Errors)
+                if (!await _userManager.CheckPasswordAsync(user, Input.Password))
                 {
-                    ModelState.AddModelError(string.Empty, error.Description);
+                    ModelState.AddModelError(string.Empty, "Incorrect password.");
+                    return Page();
                 }
-                return Page();
             }
 
-            await _signInManager.RefreshSignInAsync(user);
-            StatusMessage = "Your password has been set.";
+            IdentityResult result = await _userManager.DeleteAsync(user);
+            string userId = await _userManager.GetUserIdAsync(user);
+            if (!result.Succeeded)
+            {
+                throw new InvalidOperationException($"Unexpected error occurred deleting user.");
+            }
 
-            return RedirectToPage();
+            await _signInManager.SignOutAsync();
+
+            _logger.LogInformation("User with ID '{UserId}' deleted themselves.", userId);
+
+            return Redirect("~/");
         }
     }
 }

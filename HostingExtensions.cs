@@ -64,6 +64,8 @@ namespace CroptorAuth
 
                     options.ClientId = builder.Configuration["Authentication:Google:ClientId"];
                     options.ClientSecret = builder.Configuration["Authentication:Google:ClientSecret"];
+
+                    options.CallbackPath = "/auth/signin-google";
                 });
             //.AddFacebook(options =>
             //{
@@ -113,6 +115,8 @@ namespace CroptorAuth
             builder.Services.AddScoped<UserRepository>();
             builder.Services.AddScoped<OrderRepository>();
             builder.Services.AddScoped<WayForPayService>();
+
+            builder.Services.AddScoped<PlanService>();
 
             return builder.Build();
         }
