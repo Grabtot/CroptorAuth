@@ -23,7 +23,9 @@
                 <div class="form-group">
                     <label asp-for="Input.Password">password</label>
                     <input type="password" class="form-control" placeholder="type your password" asp-for="Input.Password" autocomplete="off">
-                    <a href="~/Account/ForgotPassword">Forgot password?</a>
+                    <div class="row-left">
+                        <a href="~/Account/ForgotPassword">Forgot password?</a>
+                    </div>
                 </div>
 
                 <button class="sign-in-button" name="Input.Button" value="login">Log in</button>
@@ -37,11 +39,11 @@
                    asp-route-returnUrl="@Model.Input.ReturnUrl">
                     @if (provider.DisplayName == "Google")
                     {
-                        <img src="~/wwwroot-auth/images/login with google.svg" alt="Log in with Google" />
+                        <img src="~/wwwroot-auth/images/login with google.svg" alt="Log in with Google"/>
                     }
                     @if (provider.DisplayName == "Facebook")
                     {
-                        <img src="~/wwwroot-auth/images/login with facebook.svg" alt="Log in with Facebook" />
+                        <img src="~/wwwroot-auth/images/login with facebook.svg" alt="Log in with Facebook"/>
                     }
                 </a>
             }
