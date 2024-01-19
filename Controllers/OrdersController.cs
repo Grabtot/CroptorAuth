@@ -7,6 +7,7 @@ using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Newtonsoft.Json;
+using Serilog;
 
 namespace CroptorAuth.Controllers;
 
@@ -33,34 +34,60 @@ public class OrdersController(WayForPayService service, IConfiguration configura
     }
 
     [HttpPost("callback")]
-    [Consumes("text/plain")]
-    public async Task<ActionResult<WayForPayCallbackResponse>> Callback([FromBody] string jsonData)
+    public async Task<ActionResult<WayForPayCallbackResponse>> Callback()
     {
-        WayForPayCallback? callback = JsonConvert.DeserializeObject<WayForPayCallback>(jsonData);
         
-        if (callback is { TransactionStatus: "Approved" })
+        string data;
+        using (StreamReader reader = new StreamReader(HttpContext.Request.Body))
         {
-            string? keyString = configuration["WayForPay:Key"];
-            if (keyString == null)
-                return BadRequest("SecretKey is null");
-            string? account = configuration["WayForPay:MerchantLogin"];
-            if (account == null)
-                return BadRequest("MerchantLogin is null");
-
-            Order order = await service.GetOrder(callback.OrderReference);
-
-            WayForPayRequest request = service.CreateRequest(order, account, keyString);
-
-            if (request.MerchantSignature == callback.MerchantSignature)
-            {
-                WayForPayCallbackResponse response = service.CreateCallbackResponse(order, keyString);
-                await service.ApproveOrder(order);
-                return Ok(response);
-            }
-            else
-                return BadRequest("Signatures aren't the same");
+            data = await reader.ReadToEndAsync();
         }
-        else
-            return BadRequest("TransactionStatus must equal \"Approved\"");
+        var queryString = HttpContext.Request.Query;
+
+        string queryStringAsString = queryString.Count > 0
+            ? "?" + string.Join("&", queryString.Select(kv => $"{kv.Key}={kv.Value}"))
+            : string.Empty;
+        
+        var formData = HttpContext.Request.Form;
+
+        // Convert the form data to a string
+        string formDataAsString = formData.Count > 0
+            ? string.Join("&", formData.Select(kv => $"{kv.Key}={kv.Value}"))
+            : string.Empty;
+        
+        Log.Information($"" +
+                        $"ContentType: {HttpContext.Request.ContentType}," +
+                        $"Body: {data}, " +
+                        $"QueryString: {queryStringAsString}" +
+                        $"FormData: {formDataAsString}");
+
+        return StatusCode(500, "not implemented");
+
+        // WayForPayCallback? callback = JsonConvert.DeserializeObject<WayForPayCallback>(jsonData);
+        //
+        // if (callback is { TransactionStatus: "Approved" })
+        // {
+        //     string? keyString = configuration["WayForPay:Key"];
+        //     if (keyString == null)
+        //         return BadRequest("SecretKey is null");
+        //     string? account = configuration["WayForPay:MerchantLogin"];
+        //     if (account == null)
+        //         return BadRequest("MerchantLogin is null");
+        //
+        //     Order order = await service.GetOrder(callback.OrderReference);
+        //
+        //     WayForPayRequest request = service.CreateRequest(order, account, keyString);
+        //
+        //     if (request.MerchantSignature == callback.MerchantSignature)
+        //     {
+        //         WayForPayCallbackResponse response = service.CreateCallbackResponse(order, keyString);
+        //         await service.ApproveOrder(order);
+        //         return Ok(response);
+        //     }
+        //     else
+        //         return BadRequest("Signatures aren't the same");
+        // }
+        // else
+        //     return BadRequest("TransactionStatus must equal \"Approved\"");
     }
 }
