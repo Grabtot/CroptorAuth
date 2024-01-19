@@ -23,6 +23,7 @@
     public enum PlanType
     {
         Free,
-        Pro
+        Pro,
+        Admin
     }
 }

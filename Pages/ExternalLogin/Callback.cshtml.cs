@@ -1,4 +1,5 @@
 using CroptorAuth.Models;
+using CroptorAuth.Services;
 using Duende.IdentityServer;
 using Duende.IdentityServer.Events;
 using Duende.IdentityServer.Services;
@@ -17,6 +18,7 @@ namespace CroptorAuth.Pages.ExternalLogin
     public class Callback : PageModel
     {
         private readonly UserManager<ApplicationUser> _userManager;
+        private readonly PlanService _planService;
         private readonly SignInManager<ApplicationUser> _signInManager;
         private readonly IIdentityServerInteractionService _interaction;
         private readonly ILogger<Callback> _logger;
@@ -27,13 +29,15 @@ namespace CroptorAuth.Pages.ExternalLogin
             IEventService events,
             ILogger<Callback> logger,
             UserManager<ApplicationUser> userManager,
-            SignInManager<ApplicationUser> signInManager)
+            SignInManager<ApplicationUser> signInManager,
+            PlanService planService)
         {
             _userManager = userManager;
             _signInManager = signInManager;
             _interaction = interaction;
             _logger = logger;
             _events = events;
+            _planService = planService;
         }
 
         public async Task<IActionResult> OnGet()
@@ -101,6 +105,8 @@ namespace CroptorAuth.Pages.ExternalLogin
             // check if external login is in the context of an OIDC request
             Duende.IdentityServer.Models.AuthorizationRequest context = await _interaction.GetAuthorizationContextAsync(returnUrl);
             await _events.RaiseAsync(new UserLoginSuccessEvent(provider, providerUserId, user.Id.ToString(), user.UserName, true, context?.Client.ClientId));
+
+            await _planService.UpdateSubscriptionForUserAsync(user);
 
             if (context != null)
             {
@@ -184,6 +190,8 @@ namespace CroptorAuth.Pages.ExternalLogin
             identityResult = await _userManager.AddLoginAsync(user, new UserLoginInfo(provider, providerUserId, provider));
             if (!identityResult.Succeeded)
                 throw new Exception(identityResult.Errors.First().Description);
+
+            await _userManager.AddClaimAsync(user, new Claim("plan", "Free"));
 
             return user;
         }

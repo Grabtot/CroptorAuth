@@ -8,7 +8,7 @@
     <partial name="_ValidationSummary"/>
     <div class="sign-card">
         <div class="header">
-            <a href="~/Account/Login?ReturnUrl=@Model.ReturnUrl">
+            <a asp-page="/Account/Login/Index" asp-route-returnUrl="@Model.ReturnUrl">
                 <div> Log in</div>
             </a>
             <div class="active">Sign Up</div>
@@ -16,6 +16,7 @@
 
         <div class="card-body">
             <form id="registerForm" asp-route-returnUrl="@Model.ReturnUrl" method="post">
+                <input type="hidden" asp-for="ReturnUrl" />
                 <div asp-validation-summary="ModelOnly" class="text-danger" role="alert"></div>
                 <div class="form-group">
                     <label asp-for="Input.UserName">username</label>

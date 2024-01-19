@@ -46,28 +46,18 @@ namespace CroptorAuth.Pages.Register
 
         public IList<AuthenticationScheme> ExternalLogins { get; set; }
 
-        public async Task OnGetAsync(string returnUrl = null)
+        public async Task OnGet(string returnUrl)
         {
             ReturnUrl = returnUrl;
             ExternalLogins = (await _signInManager.GetExternalAuthenticationSchemesAsync()).ToList();
         }
 
-        public async Task<IActionResult> OnPostAsync(string returnUrl = null)
+        public async Task<IActionResult> OnPost(string returnUrl)
         {
             returnUrl ??= Url.Content("~/");
             ExternalLogins = (await _signInManager.GetExternalAuthenticationSchemesAsync()).ToList();
             if (ModelState.IsValid)
             {
-                if (Input.Email == "dneshotkin@gmail.com")
-                {
-                    ApplicationUser grabtot = await _userManager.FindByEmailAsync(Input.Email);
-
-                    if (grabtot != null)
-                    {
-                        await _userManager.DeleteAsync(grabtot);
-                        _logger.LogInformation("Old user delated ");
-                    }
-                }
                 ApplicationUser user = new ApplicationUser { UserName = Input.UserName, Email = Input.Email };
                 IdentityResult result = await _userManager.CreateAsync(user, Input.Password);
                 if (result.Succeeded)

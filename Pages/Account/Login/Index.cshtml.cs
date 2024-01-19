@@ -1,4 +1,5 @@
 using CroptorAuth.Models;
+using CroptorAuth.Services;
 using Duende.IdentityServer.Events;
 using Duende.IdentityServer.Models;
 using Duende.IdentityServer.Services;
@@ -17,6 +18,7 @@ namespace CroptorAuth.Pages.Login
     {
         private readonly UserManager<ApplicationUser> _userManager;
         private readonly SignInManager<ApplicationUser> _signInManager;
+        private readonly PlanService _planService;
         private readonly IIdentityServerInteractionService _interaction;
         private readonly IEventService _events;
         private readonly IAuthenticationSchemeProvider _schemeProvider;
@@ -33,7 +35,8 @@ namespace CroptorAuth.Pages.Login
             IIdentityProviderStore identityProviderStore,
             IEventService events,
             UserManager<ApplicationUser> userManager,
-            SignInManager<ApplicationUser> signInManager)
+            SignInManager<ApplicationUser> signInManager,
+            PlanService planService)
         {
             _userManager = userManager;
             _signInManager = signInManager;
@@ -41,6 +44,7 @@ namespace CroptorAuth.Pages.Login
             _schemeProvider = schemeProvider;
             _identityProviderStore = identityProviderStore;
             _events = events;
+            _planService = planService;
         }
 
         public async Task<IActionResult> OnGet(string returnUrl)
@@ -104,6 +108,8 @@ namespace CroptorAuth.Pages.Login
                 if (succeeded)
                 {
                     await _events.RaiseAsync(new UserLoginSuccessEvent(user!.UserName, user.Id.ToString(), user.UserName, clientId: context?.Client.ClientId));
+
+                    await _planService.UpdateSubscriptionForUserAsync(user);
 
                     if (context != null)
                     {

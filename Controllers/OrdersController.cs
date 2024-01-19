@@ -3,6 +3,7 @@ using Croptor.Application.Orders.Queries.CreateCallbackResponse;
 using Croptor.Application.Orders.Queries.CreateRequest;
 using CroptorAuth.Models;
 using CroptorAuth.Services;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
@@ -13,17 +14,19 @@ namespace CroptorAuth.Controllers;
 public class OrdersController(WayForPayService service, IConfiguration configuration) : ControllerBase
 {
     [HttpPost]
-    [Authorize]
-    public async Task<ActionResult<WayForPayRequest>> Create([FromQuery] int amount)
+    [Authorize(AuthenticationSchemes = $"{JwtBearerDefaults.AuthenticationScheme}")]
+    public async Task<ActionResult<WayForPayRequest>> Create(int amount)
     {
-        var keyString = configuration["WayForPay:Key"];
-        if (keyString == null) return BadRequest("SecretKey is null");
-        var account = configuration["WayForPay:MerchantLogin"];
-        if (account == null) return BadRequest("MerchantLogin is null");
+        string? keyString = configuration["WayForPay:Key"];
+        if (keyString == null)
+            return BadRequest("SecretKey is null");
+        string? account = configuration["WayForPay:MerchantLogin"];
+        if (account == null)
+            return BadRequest("MerchantLogin is null");
 
         Order order = await service.CreateOrder(amount);
 
-        var request = service.CreateRequest(order, account, keyString);
+        WayForPayRequest request = service.CreateRequest(order, account, keyString);
 
         return Ok(request);
     }
@@ -33,23 +36,27 @@ public class OrdersController(WayForPayService service, IConfiguration configura
     {
         if (callback.TransactionStatus == "Approved")
         {
-            var keyString = configuration["WayForPay:Key"];
-            if (keyString == null) return BadRequest("SecretKey is null");
-            var account = configuration["WayForPay:MerchantLogin"];
-            if (account == null) return BadRequest("MerchantLogin is null");
+            string? keyString = configuration["WayForPay:Key"];
+            if (keyString == null)
+                return BadRequest("SecretKey is null");
+            string? account = configuration["WayForPay:MerchantLogin"];
+            if (account == null)
+                return BadRequest("MerchantLogin is null");
 
             Order order = await service.GetOrder(callback.OrderReference);
 
-            var request = service.CreateRequest(order, account, keyString);
+            WayForPayRequest request = service.CreateRequest(order, account, keyString);
 
             if (request.MerchantSignature == callback.MerchantSignature)
             {
-                var response = service.CreateCallbackResponse(order,keyString);
+                WayForPayCallbackResponse response = service.CreateCallbackResponse(order, keyString);
                 await service.ApproveOrder(order);
                 return Ok(response);
             }
-            else return BadRequest("Signatures aren't the same");
+            else
+                return BadRequest("Signatures aren't the same");
         }
-        else return BadRequest("TransactionStatus must equal \"Approved\"");
+        else
+            return BadRequest("TransactionStatus must equal \"Approved\"");
     }
 }
