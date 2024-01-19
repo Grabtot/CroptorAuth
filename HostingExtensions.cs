@@ -18,6 +18,7 @@ namespace CroptorAuth
         public static WebApplication ConfigureServices(this WebApplicationBuilder builder)
         {
             builder.Services.AddRazorPages();
+            builder.Services.AddControllers();
 
             string connectionString = builder.Configuration.GetConnectionString("Postgres")
                 ?? throw new Exception("Postgres connection string doesnt provided");
@@ -32,7 +33,7 @@ namespace CroptorAuth
             {
                 options.User.RequireUniqueEmail = true;
 
-                options.User.AllowedUserNameCharacters = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789-._@+ абвгґдеєжзиіїйклмнопрстуфхцчшщьюяАБВГҐДЕЄЖЗИІЇЙКЛМНОПРСТУФХЦЧШЩЬЮЯ";
+                options.User.AllowedUserNameCharacters = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789-._@+ абвгґдеєжзиіїйклмнопрстуфхцчшщьюяёАБВГҐДЕЄЁЖЗИІЇЙКЛМНОПРСТУФХЦЧШЩЬЮЯ";
             })
                 .AddEntityFrameworkStores<ApplicationDbContext>()
                 .AddDefaultTokenProviders();
@@ -52,6 +53,11 @@ namespace CroptorAuth
                 .AddAspNetIdentity<ApplicationUser>();
 
             builder.Services.AddAuthentication()
+                .AddJwtBearer(options =>
+                {
+                    options.Authority = builder.Configuration["Authentication:Jwt:Authority"];
+                    options.TokenValidationParameters.ValidateAudience = false;
+                })
                 .AddGoogle(options =>
                 {
                     options.SignInScheme = IdentityServerConstants.ExternalCookieAuthenticationScheme;
@@ -67,6 +73,25 @@ namespace CroptorAuth
             //    options.AppSecret = builder.Configuration["Authentication:Facebook:AppSecret"];
 
             //});
+
+            builder.Services.AddCors(options =>
+            {
+                options.AddPolicy("Development", policy =>
+                {
+                    policy.WithOrigins("http://localhost:3000")
+                        .AllowCredentials()
+                        .AllowAnyHeader()
+                        .AllowAnyMethod();
+                });
+
+                options.AddPolicy("Production", policy =>
+                {
+                    policy.WithOrigins("https://croptor.com")
+                        .AllowCredentials()
+                        .AllowAnyHeader()
+                        .AllowAnyMethod();
+                });
+            });
 
             EmailOptions emailOptions = new();//builder.Configuration.GetSection(EmailOptions.SectionName)
             builder.Configuration.Bind(EmailOptions.SectionName, emailOptions);
@@ -96,10 +121,15 @@ namespace CroptorAuth
         {
             app.UseSerilogRequestLogging();
 
-            if (app.Environment.IsDevelopment())
+            bool isDevelopment = app.Environment.IsDevelopment();
+
+            if (isDevelopment)
             {
                 app.UseDeveloperExceptionPage();
             }
+
+            string corsPolicy = isDevelopment ? "Development" : "Production";
+            app.UseCors(corsPolicy);
 
             app.UseStaticFiles();
             app.UseRouting();
@@ -108,6 +138,8 @@ namespace CroptorAuth
 
             app.MapRazorPages()
                 .RequireAuthorization();
+
+            app.MapControllers();
 
             return app;
         }

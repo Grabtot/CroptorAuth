@@ -6,8 +6,8 @@
     <partial name="_ValidationSummary"/>
     <div class="sign-card">
         <div class="header">
-            <div class="active">Log in</div>
-            <a href="~/Account/Register?ReturnUrl=@Model.Input.ReturnUrl">
+            <div class="active">Login</div>
+            <a asp-page="/Account/Register/Index" asp-route-returnUrl="@Model.Input.ReturnUrl">
                 <div>Sign Up</div>
             </a>
         </div>
