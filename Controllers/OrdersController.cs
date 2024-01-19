@@ -6,6 +6,7 @@ using CroptorAuth.Services;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Newtonsoft.Json;
 using Serilog;
 
 namespace CroptorAuth.Controllers;
@@ -33,10 +34,12 @@ public class OrdersController(WayForPayService service, IConfiguration configura
     }
 
     [HttpPost("callback")]
-    public async Task<ActionResult<WayForPayCallbackResponse>> Callback([FromForm] WayForPayCallback callback)
+    [Consumes("text/plain")]
+    public async Task<ActionResult<WayForPayCallbackResponse>> Callback([FromBody] string jsonData)
     {
-        Log.Information($"Callback started {callback.TransactionStatus}");
-        if (callback.TransactionStatus == "Approved")
+        WayForPayCallback? callback = JsonConvert.DeserializeObject<WayForPayCallback>(jsonData);
+
+        if (callback is { TransactionStatus: "Approved" })
         {
             string? keyString = configuration["WayForPay:Key"];
             if (keyString == null)
