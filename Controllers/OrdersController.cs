@@ -33,33 +33,72 @@ public class OrdersController(WayForPayService service, IConfiguration configura
         return Ok(request);
     }
 
-    [HttpPost("callback")]
+    [Route("callback")]
     public async Task<ActionResult<WayForPayCallbackResponse>> Callback()
     {
-        
-        string data;
-        using (StreamReader reader = new StreamReader(HttpContext.Request.Body))
+        string body;
+        try
         {
-            data = await reader.ReadToEndAsync();
+            using var reader = new StreamReader(HttpContext.Request.Body);
+            body = await reader.ReadToEndAsync();
         }
-        var queryString = HttpContext.Request.Query;
+        catch (Exception e)
+        {
+            body = "Can't get";
+        }
 
-        string queryStringAsString = queryString.Count > 0
-            ? "?" + string.Join("&", queryString.Select(kv => $"{kv.Key}={kv.Value}"))
-            : string.Empty;
+        string headersAsString;
+        try
+        {
+            IHeaderDictionary headers = HttpContext.Request.Headers;
         
-        var formData = HttpContext.Request.Form;
+            // Convert the headers to a string
+            headersAsString = headers.Count > 0
+                ? string.Join(Environment.NewLine, headers.Select(kv => $"{kv.Key}: {string.Join(", ", kv.Value)}"))
+                : string.Empty;
+        }
+        catch (Exception _)
+        {
+            headersAsString = "Can't get";
+        }
 
-        // Convert the form data to a string
-        string formDataAsString = formData.Count > 0
-            ? string.Join("&", formData.Select(kv => $"{kv.Key}={kv.Value}"))
-            : string.Empty;
+        string queryStringAsString;
+        try
+        {
+            var queryString = HttpContext.Request.Query;
+
+            queryStringAsString = queryString.Count > 0
+                ? "?" + string.Join("&", queryString.Select(kv => $"{kv.Key}={kv.Value}"))
+                : string.Empty;
+        }
+        catch (Exception _)
+        {
+            queryStringAsString = "Can't get";
+        }
+
+        string formDataAsString;
+        try
+        {
+            var formData = HttpContext.Request.Form;
+
+            // Convert the form data to a string
+            formDataAsString = formData.Count > 0
+                ? string.Join("&", formData.Select(kv => $"{kv.Key}={kv.Value}"))
+                : string.Empty;
+        }
+        catch (Exception _)
+        {
+            formDataAsString = "Can't get";
+        }
+        
         
         Log.Information($"" +
-                        $"ContentType: {HttpContext.Request.ContentType}," +
-                        $"Body: {data}, " +
-                        $"QueryString: {queryStringAsString}" +
-                        $"FormData: {formDataAsString}");
+                        $"Method: {HttpContext.Request.Method}\n" +
+                        $"Headers: \n{headersAsString}\n" +
+                        $"\n\nContentType: {HttpContext.Request.ContentType}\n" +
+                        $"Body: {body}\n" +
+                        $"QueryString: {queryStringAsString}\n" +
+                        $"FormData: {formDataAsString}\n");
 
         return StatusCode(500, "not implemented");
 
