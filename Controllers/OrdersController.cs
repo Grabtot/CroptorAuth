@@ -6,6 +6,7 @@ using CroptorAuth.Services;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Serilog;
 
 namespace CroptorAuth.Controllers;
 
@@ -34,6 +35,7 @@ public class OrdersController(WayForPayService service, IConfiguration configura
     [HttpPost("callback")]
     public async Task<ActionResult<WayForPayCallbackResponse>> Callback([FromForm] WayForPayCallback callback)
     {
+        Log.Information($"Callback started {callback.TransactionStatus}");
         if (callback.TransactionStatus == "Approved")
         {
             string? keyString = configuration["WayForPay:Key"];
@@ -47,6 +49,8 @@ public class OrdersController(WayForPayService service, IConfiguration configura
 
             WayForPayRequest request = service.CreateRequest(order, account, keyString);
 
+            Log.Information($"Request signature: {request.MerchantSignature}, Callback signature {callback.MerchantSignature}," +
+                $" {request.MerchantSignature == callback.MerchantSignature}");
             if (request.MerchantSignature == callback.MerchantSignature)
             {
                 WayForPayCallbackResponse response = service.CreateCallbackResponse(order, keyString);
@@ -57,6 +61,9 @@ public class OrdersController(WayForPayService service, IConfiguration configura
                 return BadRequest("Signatures aren't the same");
         }
         else
+        {
+            Log.Error($"callback fail. Reason {callback.Reason}");
             return BadRequest("TransactionStatus must equal \"Approved\"");
+        }
     }
 }
