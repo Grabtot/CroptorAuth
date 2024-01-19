@@ -136,3 +136,13 @@
     display: flex;
     justify-content: end;
 }
+.logoContainer {
+    cursor: pointer;
+    -webkit-user-drag: none;
+    position: absolute;
+    top: 1.0rem;
+    left: 1.0rem;
+}
+.logoContainer img {
+    width: 10.35rem;
+}
