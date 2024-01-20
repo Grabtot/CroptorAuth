@@ -19,5 +19,5 @@
         public Guid Id { get; private set; }
         public Guid UserId { get; private set; }
         public int Amount { get; private set; }
-    }
+    }   
 }
