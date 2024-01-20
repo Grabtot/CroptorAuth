@@ -73,7 +73,7 @@ public class WayForPayService(
         return wfpcr;
     }
 
-    private string HashParams(List<string> data, string keyString)
+    public string HashParams(List<string> data, string keyString)
     {
         byte[] source = Encoding.UTF8.GetBytes(String.Join(";", data));
         byte[] key = Encoding.UTF8.GetBytes(keyString);

@@ -46,6 +46,7 @@ public class OrdersController(WayForPayService service, IConfiguration configura
         {
             return BadRequest("There is no body");
         }
+
         Log.Debug($"Body: {body}");
         WayForPayCallback? callback = JsonConvert.DeserializeObject<WayForPayCallback>(body);
 
@@ -57,6 +58,7 @@ public class OrdersController(WayForPayService service, IConfiguration configura
                 Log.Error("SecretKey is null");
                 return BadRequest("SecretKey is null");
             }
+
             string? account = configuration["WayForPay:MerchantLogin"];
             if (account == null)
             {
@@ -64,28 +66,32 @@ public class OrdersController(WayForPayService service, IConfiguration configura
                 return BadRequest("MerchantLogin is null");
             }
 
-            Order order = await service.GetOrder(callback.OrderReference);
-
-            WayForPayRequest request = service.CreateRequest(order, account, keyString);
-            Log.Debug($"Request: {request}");
             Log.Debug($"Callback: {callback}");
+            var signature = service.HashParams([
+                callback.MerchantAccount,
+                callback.OrderReference.ToString(),
+                callback.Amount.ToString(),
+                callback.Currency,
+                callback.AuthCode,
+                callback.CardPan,
+                callback.TransactionStatus,
+                callback.ReasonCode
+            ], keyString);
+            Log.Debug(signature);
 
-            if (request.MerchantSignature == callback.MerchantSignature)
+            if (callback.MerchantSignature == signature)
             {
+                Order order = await service.GetOrder(callback.OrderReference);
                 WayForPayCallbackResponse response = service.CreateCallbackResponse(order, keyString);
                 await service.ApproveOrder(order);
                 return Ok(response);
             }
-            else
-            {
-                Log.Error("Signatures aren't the same");
-                return BadRequest("Signatures aren't the same");
-            }
+
+            Log.Error("Signatures aren't the same");
+            return BadRequest("Signatures aren't the same");
         }
-        else
-        {
-            Log.Error("TransactionStatus must equal \"Approved\"");
-            return BadRequest("TransactionStatus must equal \"Approved\"");
-        }
+
+        Log.Error("TransactionStatus must equal \"Approved\"");
+        return BadRequest("TransactionStatus must equal \"Approved\"");
     }
 }
