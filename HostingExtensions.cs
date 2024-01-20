@@ -46,11 +46,11 @@ namespace CroptorAuth
                     options.Events.RaiseFailureEvents = true;
                     options.Events.RaiseSuccessEvents = true;
                 })
-                // .AddProfileService<CroptorProfileService>()
                 .AddInMemoryIdentityResources(Config.IdentityResources)
                 .AddInMemoryApiScopes(Config.ApiScopes)
                 .AddInMemoryClients(Config.Clients)
-                .AddAspNetIdentity<ApplicationUser>();
+                .AddAspNetIdentity<ApplicationUser>()
+                .AddProfileService<CroptorProfileService>();
 
             builder.Services.AddAuthentication()
                 .AddJwtBearer(options =>
@@ -65,7 +65,7 @@ namespace CroptorAuth
                     options.ClientId = builder.Configuration["Authentication:Google:ClientId"];
                     options.ClientSecret = builder.Configuration["Authentication:Google:ClientSecret"];
 
-                    options.CallbackPath = "/auth/signin-google";
+                    options.CallbackPath = "/signin-google";
                 });
             //.AddFacebook(options =>
             //{

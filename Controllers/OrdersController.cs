@@ -67,7 +67,7 @@ public class OrdersController(WayForPayService service, IConfiguration configura
             }
 
             Log.Debug($"Callback: {callback}");
-            var signature = service.HashParams([
+            string signature = service.HashParams([
                 callback.MerchantAccount,
                 callback.OrderReference.ToString(),
                 callback.Amount.ToString(),
@@ -84,6 +84,8 @@ public class OrdersController(WayForPayService service, IConfiguration configura
                 Order order = await service.GetOrder(callback.OrderReference);
                 WayForPayCallbackResponse response = service.CreateCallbackResponse(order, keyString);
                 await service.ApproveOrder(order);
+
+                Log.Debug($"Callback response: {response}");
                 return Ok(response);
             }
 

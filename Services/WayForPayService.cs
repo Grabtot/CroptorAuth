@@ -38,7 +38,8 @@ public class WayForPayService(
             expireDate = DateOnly.FromDateTime(DateTime.Now);
         expireDate = expireDate.AddMonths(order.Amount);
         user.Plan = Plan.Create(PlanType.Pro, expireDate);
-        // await userManager.ReplaceClaimAsync(user, new Claim("plan", "Free"), new Claim("plan", "Pro"));
+
+        await userRepository.UpdateAsync(user);
         await orderRepository.DeleteOrderAsync(order);
     }
 

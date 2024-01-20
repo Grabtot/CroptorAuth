@@ -8,7 +8,6 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.AspNetCore.WebUtilities;
-using System.Security.Claims;
 using System.Text;
 
 namespace CroptorAuth.Pages.Register
@@ -64,7 +63,7 @@ namespace CroptorAuth.Pages.Register
                 {
                     _logger.LogInformation("User created a new account with password.");
 
-                    await _userManager.AddClaimAsync(user, new Claim("plan", user.Plan.Type.ToString()));
+                    //  await _userManager.AddClaimAsync(user, new Claim("plan", user.Plan.Type.ToString()));
 
                     string code = await _userManager.GenerateEmailConfirmationTokenAsync(user);
                     code = WebEncoders.Base64UrlEncode(Encoding.UTF8.GetBytes(code));

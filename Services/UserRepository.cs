@@ -14,5 +14,12 @@ namespace Croptor.Infrastructure.Persistence.Repositories
                    ?? throw new InvalidOperationException($"Could not find User {userId}");
         }
 
+        public async Task UpdateAsync(ApplicationUser user)
+        {
+            _dbSet.Update(user);
+
+            await context.SaveChangesAsync();
+        }
+
     }
 }

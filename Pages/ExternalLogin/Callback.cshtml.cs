@@ -191,7 +191,7 @@ namespace CroptorAuth.Pages.ExternalLogin
             if (!identityResult.Succeeded)
                 throw new Exception(identityResult.Errors.First().Description);
 
-            await _userManager.AddClaimAsync(user, new Claim("plan", "Free"));
+            // await _userManager.AddClaimAsync(user, new Claim("plan", "Free"));
 
             return user;
         }

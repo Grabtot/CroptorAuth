@@ -39,7 +39,7 @@ namespace CroptorAuth
                     AllowedCorsOrigins = { "http://localhost:3000" ,"https://croptor.com"},
                     AllowOfflineAccess = true,
 
-                    AllowedScopes = { "openid", "profile", "croptor" },
+                    AllowedScopes = { "openid", "profile", "croptor", "plan" },
 
                 }
             };
