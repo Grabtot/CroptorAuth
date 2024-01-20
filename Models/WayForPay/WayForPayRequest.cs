@@ -12,7 +12,7 @@ public record WayForPayRequest
     public string OrderReference { get; init; }
     public long OrderDate { get; init; } = 1;
     public int Amount { get; init; }
-    public string Currency { get; init; } = "UAH";
+    public string Currency { get; init; } = "USD";
     public int ProductCount { get; init; }
     public string ProductName { get; init; } = "ProPlan";
     public int ProductPrice { get; init; }
@@ -22,7 +22,7 @@ public record WayForPayRequest
     {
         MerchantAccount = account;
         OrderReference = order.Id.ToString();
-        ProductPrice = 5; //TODO: Змінити на 9
+        ProductPrice = 9;
         ProductCount = order.Amount;
         Amount = ProductPrice * ProductCount;
         ClientAccountId = order.UserId.ToString();

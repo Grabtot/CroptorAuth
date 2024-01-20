@@ -151,6 +151,8 @@ namespace CroptorAuth.Pages.Login
 
         private async Task BuildModelAsync(string returnUrl)
         {
+
+
             Input = new InputModel
             {
                 ReturnUrl = returnUrl
