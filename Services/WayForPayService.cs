@@ -1,9 +1,9 @@
-﻿using System.Security.Cryptography;
-using System.Text;
-using Croptor.Application.Orders.Queries.CreateCallbackResponse;
+﻿using Croptor.Application.Orders.Queries.CreateCallbackResponse;
 using Croptor.Application.Orders.Queries.CreateRequest;
 using Croptor.Infrastructure.Persistence.Repositories;
 using CroptorAuth.Models;
+using System.Security.Cryptography;
+using System.Text;
 
 namespace CroptorAuth.Services;
 
@@ -21,8 +21,9 @@ public class WayForPayService(
 
         Guid userId = userProvider.UserId.Value;
         Order order = Order.Create(userId, amount);
-        
+
         await orderRepository.AddAsync(order);
+
 
         return order;
     }
@@ -40,11 +41,11 @@ public class WayForPayService(
         // await userManager.ReplaceClaimAsync(user, new Claim("plan", "Free"), new Claim("plan", "Pro"));
         await orderRepository.DeleteOrderAsync(order);
     }
-    
+
     public WayForPayRequest CreateRequest(Order order, string account, string secretKey)
-    {   
-        var wfpr = new WayForPayRequest(order, account);
-        
+    {
+        WayForPayRequest wfpr = new WayForPayRequest(order, account);
+
         wfpr.MerchantSignature = HashParams([
             wfpr.MerchantAccount,
             wfpr.MerchantDomainName,
@@ -56,26 +57,26 @@ public class WayForPayService(
             wfpr.ProductCount.ToString(),
             wfpr.ProductPrice.ToString()
         ], secretKey);
-        
+
         return wfpr;
     }
     public WayForPayCallbackResponse CreateCallbackResponse(Order order, string secretKey)
     {
-        var wfpcr = new WayForPayCallbackResponse(order);
-        
+        WayForPayCallbackResponse wfpcr = new WayForPayCallbackResponse(order);
+
         wfpcr.Signature = HashParams([
             wfpcr.OrderReference.ToString(),
             wfpcr.Status,
             wfpcr.Time.ToString()
         ], secretKey);
-        
+
         return wfpcr;
     }
 
     private string HashParams(List<string> data, string keyString)
     {
-        var source = Encoding.UTF8.GetBytes(String.Join(";", data));
-        var key = Encoding.UTF8.GetBytes(keyString);
+        byte[] source = Encoding.UTF8.GetBytes(String.Join(";", data));
+        byte[] key = Encoding.UTF8.GetBytes(keyString);
         return BitConverter.ToString(HMACMD5.HashData(key, source)).Replace("-", "").ToLower();
     }
     private class UserNotAuthenticatedException : Exception

@@ -39,29 +39,37 @@ public class OrdersController(WayForPayService service, IConfiguration configura
         string body;
         try
         {
-            using var reader = new StreamReader(HttpContext.Request.Body);
+            using StreamReader reader = new(HttpContext.Request.Body);
             body = await reader.ReadToEndAsync();
         }
-        catch (Exception e)
+        catch (Exception)
         {
             return BadRequest("There is no body");
         }
-        
+        Log.Debug($"Body: {body}");
         WayForPayCallback? callback = JsonConvert.DeserializeObject<WayForPayCallback>(body);
-        
+
         if (callback is { TransactionStatus: "Approved" })
         {
             string? keyString = configuration["WayForPay:Key"];
             if (keyString == null)
+            {
+                Log.Error("SecretKey is null");
                 return BadRequest("SecretKey is null");
+            }
             string? account = configuration["WayForPay:MerchantLogin"];
             if (account == null)
+            {
+                Log.Error("MerchantLogin is null");
                 return BadRequest("MerchantLogin is null");
-        
+            }
+
             Order order = await service.GetOrder(callback.OrderReference);
-        
+
             WayForPayRequest request = service.CreateRequest(order, account, keyString);
-        
+            Log.Debug($"Request: {request}");
+            Log.Debug($"Callback: {callback}");
+
             if (request.MerchantSignature == callback.MerchantSignature)
             {
                 WayForPayCallbackResponse response = service.CreateCallbackResponse(order, keyString);
@@ -69,9 +77,15 @@ public class OrdersController(WayForPayService service, IConfiguration configura
                 return Ok(response);
             }
             else
+            {
+                Log.Error("Signatures aren't the same");
                 return BadRequest("Signatures aren't the same");
+            }
         }
         else
+        {
+            Log.Error("TransactionStatus must equal \"Approved\"");
             return BadRequest("TransactionStatus must equal \"Approved\"");
+        }
     }
 }

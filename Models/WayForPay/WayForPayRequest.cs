@@ -12,7 +12,7 @@ public record WayForPayRequest
     public string OrderReference { get; init; }
     public long OrderDate { get; init; } = 1;
     public int Amount { get; init; }
-    public string Currency { get; init; } = "USD";
+    public string Currency { get; init; } = "UAH";
     public int ProductCount { get; init; }
     public string ProductName { get; init; } = "ProPlan";
     public int ProductPrice { get; init; }
@@ -22,7 +22,7 @@ public record WayForPayRequest
     {
         MerchantAccount = account;
         OrderReference = order.Id.ToString();
-        ProductPrice = 0; //TODO: Змінити на 9
+        ProductPrice = 5; //TODO: Змінити на 9
         ProductCount = order.Amount;
         Amount = ProductPrice * ProductCount;
         ClientAccountId = order.UserId.ToString();
@@ -30,6 +30,22 @@ public record WayForPayRequest
 
     public WayForPayRequest()
     {
-        
+
+    }
+    public override string ToString()
+    {
+        return $"MerchantAccount: {MerchantAccount}, " +
+               $"MerchantDomainName: {MerchantDomainName}, " +
+               $"MerchantSignature: {MerchantSignature}, " +
+               $"ReturnUrl: {ReturnUrl}, " +
+               $"ServiceUrl: {ServiceUrl}, " +
+               $"OrderReference: {OrderReference}, " +
+               $"OrderDate: {OrderDate}, " +
+               $"Amount: {Amount}, " +
+               $"Currency: {Currency}, " +
+               $"ProductCount: {ProductCount}, " +
+               $"ProductName: {ProductName}, " +
+               $"ProductPrice: {ProductPrice}, " +
+               $"ClientAccountId: {ClientAccountId}";
     }
 }
