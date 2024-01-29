@@ -15,7 +15,7 @@ namespace CroptorAuth.Services
             {
                 List<ApplicationUser> users = await _dbSet
                     .Where(user => user.Plan.ExpireDate != null
-                        && user.Plan.ExpireDate > DateOnly.FromDateTime(DateTime.Now)
+                        && user.Plan.ExpireDate < DateOnly.FromDateTime(DateTime.Now)
                         && user.Plan.Type == PlanType.Pro)
                     .ToListAsync();
 
@@ -42,7 +42,7 @@ namespace CroptorAuth.Services
         {
             try
             {
-                if (user.Plan.ExpireDate != null && user.Plan.ExpireDate > DateOnly.FromDateTime(DateTime.Now) && user.Plan.Type == PlanType.Pro)
+                if (user.Plan.ExpireDate != null && user.Plan.ExpireDate < DateOnly.FromDateTime(DateTime.Now) && user.Plan.Type == PlanType.Pro)
                 {
                     user.Plan = Plan.Create(PlanType.Free);
 

@@ -34,10 +34,7 @@ public class WayForPayService(
         ApplicationUser user = await userRepository.GetUserAsync(order.UserId);
         DateOnly expireDate;
 
-        Log.Debug($"Expire Date: , {user.Plan.ExpireDate}");
-
-        if (user.Plan.ExpireDate.HasValue && user.Plan.ExpireDate != default &&
-                user.Plan.ExpireDate > DateOnly.FromDateTime(DateTime.Now))
+        if (user.Plan.ExpireDate.HasValue && user.Plan.ExpireDate != default)
         {
             expireDate = user.Plan.ExpireDate.Value;
         }
@@ -45,13 +42,13 @@ public class WayForPayService(
         {
             expireDate = DateOnly.FromDateTime(DateTime.Now);
         }
+        Log.Debug($"Current expire Date: {expireDate}");
 
-        Log.Debug($"User: {user}");
 
         expireDate = expireDate.AddMonths(order.Amount);
         user.Plan = Plan.Create(PlanType.Pro, expireDate);
 
-
+        Log.Debug($"User: {user}");
 
         await userRepository.UpdateAsync(user);
         await orderRepository.DeleteOrderAsync(order);
