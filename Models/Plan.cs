@@ -17,7 +17,10 @@
         {
             return new Plan(type, expireDate);
         }
-
+        public override string ToString()
+        {
+            return $"{Type} {ExpireDate}";
+        }
     }
 
     public enum PlanType

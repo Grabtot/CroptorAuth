@@ -50,20 +50,20 @@ public class OrdersController(WayForPayService service, IConfiguration configura
         Log.Debug($"Body: {body}");
         WayForPayCallback? callback = JsonConvert.DeserializeObject<WayForPayCallback>(body);
 
+        string? keyString = configuration["WayForPay:Key"];
+        if (keyString == null)
+        {
+            Log.Error("SecretKey is null");
+            return Problem(statusCode: 500);
+        }
+
         if (callback is { TransactionStatus: "Approved" })
         {
-            string? keyString = configuration["WayForPay:Key"];
-            if (keyString == null)
-            {
-                Log.Error("SecretKey is null");
-                return BadRequest("SecretKey is null");
-            }
-
             string? account = configuration["WayForPay:MerchantLogin"];
             if (account == null)
             {
                 Log.Error("MerchantLogin is null");
-                return BadRequest("MerchantLogin is null");
+                return Problem(statusCode: 500);
             }
 
             Log.Debug($"Callback: {callback}");
@@ -82,18 +82,29 @@ public class OrdersController(WayForPayService service, IConfiguration configura
             if (callback.MerchantSignature == signature)
             {
                 Order order = await service.GetOrder(callback.OrderReference);
-                WayForPayCallbackResponse response = service.CreateCallbackResponse(order, keyString);
+                WayForPayCallbackResponse success = service.CreateCallbackResponse(order.Id, keyString);
                 await service.ApproveOrder(order);
 
-                Log.Debug($"Callback response: {response}");
-                return Ok(response);
+                Log.Debug($"Callback response: {success}");
+                return Ok(success);
             }
 
             Log.Error("Signatures aren't the same");
-            return BadRequest("Signatures aren't the same");
+            return Refuse(service, callback, keyString);
         }
 
+
         Log.Error("TransactionStatus must equal \"Approved\"");
-        return BadRequest("TransactionStatus must equal \"Approved\"");
+        return Refuse(service, callback!, keyString);
+    }
+
+    private ActionResult<WayForPayCallbackResponse> Refuse(WayForPayService service, WayForPayCallback callback, string keyString)
+    {
+
+        WayForPayCallbackResponse response = service
+            .CreateCallbackResponse(callback.OrderReference, keyString, "refuse");
+
+        Log.Debug($"Callback response: {response}");
+        return Ok(response);
     }
 }

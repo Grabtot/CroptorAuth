@@ -4,6 +4,7 @@ using Serilog;
 
 Log.Logger = new LoggerConfiguration()
     .WriteTo.Console()
+    .WriteTo.File(Path.Combine(AppContext.BaseDirectory, "/logs/authlogs.txt"))
     .CreateBootstrapLogger();
 
 Log.Information("Starting up");

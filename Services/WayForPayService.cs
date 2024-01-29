@@ -2,6 +2,7 @@
 using Croptor.Application.Orders.Queries.CreateRequest;
 using Croptor.Infrastructure.Persistence.Repositories;
 using CroptorAuth.Models;
+using Serilog;
 using System.Security.Cryptography;
 using System.Text;
 
@@ -32,12 +33,25 @@ public class WayForPayService(
     {
         ApplicationUser user = await userRepository.GetUserAsync(order.UserId);
         DateOnly expireDate;
-        if (user.Plan.ExpireDate.HasValue)
+
+        Log.Debug($"Expire Date: , {user.Plan.ExpireDate}");
+
+        if (user.Plan.ExpireDate.HasValue && user.Plan.ExpireDate != default &&
+                user.Plan.ExpireDate > DateOnly.FromDateTime(DateTime.Now))
+        {
             expireDate = user.Plan.ExpireDate.Value;
+        }
         else
+        {
             expireDate = DateOnly.FromDateTime(DateTime.Now);
+        }
+
+        Log.Debug($"User: {user}");
+
         expireDate = expireDate.AddMonths(order.Amount);
         user.Plan = Plan.Create(PlanType.Pro, expireDate);
+
+
 
         await userRepository.UpdateAsync(user);
         await orderRepository.DeleteOrderAsync(order);
@@ -61,9 +75,9 @@ public class WayForPayService(
 
         return wfpr;
     }
-    public WayForPayCallbackResponse CreateCallbackResponse(Order order, string secretKey)
+    public WayForPayCallbackResponse CreateCallbackResponse(Guid orderId, string secretKey, string status = "accept")
     {
-        WayForPayCallbackResponse wfpcr = new WayForPayCallbackResponse(order);
+        WayForPayCallbackResponse wfpcr = new(orderId, status);
 
         wfpcr.Signature = HashParams([
             wfpcr.OrderReference.ToString(),

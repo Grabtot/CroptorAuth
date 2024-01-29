@@ -1,17 +1,16 @@
-﻿using CroptorAuth.Models;
-
-namespace Croptor.Application.Orders.Queries.CreateCallbackResponse;
+﻿namespace Croptor.Application.Orders.Queries.CreateCallbackResponse;
 
 public record WayForPayCallbackResponse
 {
     public Guid OrderReference { get; init; }
-    public string Status { get; init; } = "accept";
+    public string Status { get; init; }
     public long Time { get; init; } = 2;
     public string Signature { get; set; } = null!;
 
-    public WayForPayCallbackResponse(Order order)
+    public WayForPayCallbackResponse(Guid orderId, string status = "accept")
     {
-        OrderReference = order.Id;
+        OrderReference = orderId;
+        Status = status;
     }
 
     public override string ToString()
