@@ -106,7 +106,7 @@ namespace CroptorAuth.Pages.ExternalLogin
             Duende.IdentityServer.Models.AuthorizationRequest context = await _interaction.GetAuthorizationContextAsync(returnUrl);
             await _events.RaiseAsync(new UserLoginSuccessEvent(provider, providerUserId, user.Id.ToString(), user.UserName, true, context?.Client.ClientId));
 
-            await _planService.UpdateSubscriptionForUserAsync(user);
+         //   await _planService.UpdateSubscriptionForUserAsync(user);
 
             if (context != null)
             {

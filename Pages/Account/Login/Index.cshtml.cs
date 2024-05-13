@@ -109,7 +109,7 @@ namespace CroptorAuth.Pages.Login
                 {
                     await _events.RaiseAsync(new UserLoginSuccessEvent(user!.UserName, user.Id.ToString(), user.UserName, clientId: context?.Client.ClientId));
 
-                    await _planService.UpdateSubscriptionForUserAsync(user);
+                  //  await _planService.UpdateSubscriptionForUserAsync(user);
 
                     if (context != null)
                     {
